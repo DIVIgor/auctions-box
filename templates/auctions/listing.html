@@ -1,0 +1,109 @@
+{% extends 'layout.html' %}
+
+{% block title %}{{ listing.name }}{% endblock title %}
+
+{% block body %}
+    <div class="lst-grid">
+        <div class="lg-img">
+            {% if listing.image %}
+                <img class="lg-img-big" src="{{ listing.image }}" alt="{{ listing.name }}">
+            {% else %}
+                <img class="lg-img-big" src="https://media.istockphoto.com/vectors/default-image-icon-vector-missing-picture-page-for-website-design-or-vector-id1357365823?b=1&k=20&m=1357365823&s=170667a&w=0&h=y6ufWZhEt3vYWetga7F33Unbfta2oQXCZLUsEa67ydM=" alt="No image available">
+            {% endif %}
+        </div>
+
+        <div class="lg-name">
+            <h1 class="lst-title">{{ listing.name }}</h1>
+        </div>
+        
+        <div class="lg-actions">
+            <div class="cur-bid">
+                {% if current_bid %}
+                    Current bid: <span id="price">US ${{ current_bid }}</span>
+                {% else %}
+                    Starting bid: <span id="price">US ${{ start_bid }}</span>
+                {% endif %}
+            </div>
+    
+            <div class="new-bid-info">
+                {% if user.is_authenticated and user != listing_owner and user != current_bid_owner %}
+                    {% if listing.is_active %}
+                        <form id="id-bid-form" method="POST">
+                            {% csrf_token %}
+                            {{ bid_form.bid }}
+                            <button id="make-bid" type="submit" name="bid_submit" value="bid">Place bid</button>
+                        </form>
+                    {% endif %}
+                {% elif user == current_bid_owner and listing.is_active %}
+                    <h3>Your bid is the highest</h3>
+                {% elif user == listing_owner and listing.is_active %}
+                    <a id="gla-btn" href="{% url 'auctions:close_listing' cat_slug listing_slug %}">Close listing</a>
+                {% endif %}
+                {% if not listing.is_active and user == current_bid_owner %}
+                    <h3>Your bid won!</h3>
+                {% elif not listing.is_active and user != current_bid_owner %}
+                    <h3>Winner: {{ current_bid_owner }}</h3>
+                {% endif %}
+            </div>
+
+            {% if user.is_authenticated and user != listing_owner and listing.is_active %}
+                <div class="watchlist">
+                    <a id="gla-btn" href="{% url 'auctions:watch' cat_slug listing_slug %}">
+                        {% if in_watchlist %}
+                            Delete from watchlist
+                        {% else %}
+                            Add to watchlist
+                        {% endif %}
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="lg-seller">
+            <span>
+                Seller: {{ listing_owner }}
+            </span>
+        </div>
+        <div class="lg-descr">
+            <h3>Description</h3>
+            {{ listing.description }}
+        </div>
+    </div>
+
+    {% if user.is_authenticated %}
+        <div class="lg-add-comment">
+            <details>
+                <summary>Add a comment</summary>
+                <form class="comment-form" method="POST">
+                    {% csrf_token %}
+                    {{ comment_form.text }}
+                    <div class="sbmt-btn">
+                        <button id="comment" type="submit" name="comment_submit" value="comment">Comment</button>
+                    </div>
+                </form>
+            </details>
+        </div>
+    {% endif %}
+    
+        <div class="lg-comments">
+            <h3 id="comments-header">
+                Comments: {{ comments.count }}
+            </h3>
+            {% if comments %}
+                {% for comment in comments %}
+                    <div class="comment">
+                        <div class="comment-title">
+                            by <b>{{ comment.user }}</b> <i>added {{ comment.date_added }}</i>
+                        </div>
+                        <div class="comment-text">
+                            {{ comment.text }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div style="border-bottom: solid 1px rgba(0,0,0,.1);">
+                    <i>No comments for this listing yet.</i>
+                </div>
+            {% endif %}
+        </div>
+{% endblock body %}

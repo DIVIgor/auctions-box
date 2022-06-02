@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+
+{% block title %}Add listing{% endblock title %}
+
+{% block body %}
+    <h1 class="page-title">Add listing</h1>
+
+    <div class="form-field">
+        <form action="{% url 'auctions:add_listing' %}" method='POST'>
+            {% csrf_token %}
+            {% for field in listing_form %}
+                <div class="field-form">
+                    <div class="field-label">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    </div>
+                    <div class="field">
+                        {{ field }}
+                    </div>
+                    <div class="field-error">
+                        {{ field.errors }}
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="sbmt-btn">
+                <button class="add-listing-btn" type="submit">Add Listing</button>
+            </div>
+        </form>
+    </div>
+{% endblock body %}
