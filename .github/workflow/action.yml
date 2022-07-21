@@ -1,0 +1,26 @@
+name: CS-50 commerce CI
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    env:
+      DATABASE_URL: postgresql://postgres:${{ secrets.SECRET_PASSWORD }}@postgres/postgres
+      PSQL_DB: ${{ secrets.PSQL_DB }}
+      PSQL_V: ${{ secrets.PSQL_V }}
+      PSQL_NAME: ${{ secrets.PSQL_NAME }}
+      PSQL_PASS: ${{ secrets.PSQL_PASS }}
+      PSQL_U: ${{ secrets.PSQL_U }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      PORT: 1597
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build the docker-compose stack
+        run: docker-compose -f docker-compose.yml up -d
+      - name: Check running containers
+        run: docker ps -a
+      - name: Check logs
+        run: docker logs backend

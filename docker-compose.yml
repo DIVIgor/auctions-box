@@ -3,7 +3,7 @@ version: "3.9"
 services:
   db:
     container_name: postgres
-    image: postgres:${PSQL_V}
+    image: postgres:${PSQL_V}-alpine
     volumes:
       - db-data:/var/lib/postgresql/data
     environment:
@@ -18,16 +18,10 @@ services:
     container_name: cs-50_commerce
     build: . -t cs-50-commerce:1.5
     command: python manage.py runserver 0.0.0.0:8000
-    # command: >
-    #   sh -c "wait_for_db &&
-    #         python manage.py migrate &&
-    #         python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
-    # expose:
-    #   - 8000
     ports:
-      - 8000:8000
+      - ${PORT}:8000
     environment:
       - POSTGRES_NAME=${PSQL_NAME}
       - POSTGRES_USER=${PSQL_U}
