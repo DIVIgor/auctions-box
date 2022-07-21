@@ -27,7 +27,7 @@ class Listing(models.Model):
     name = models.CharField(max_length=250)
     slug = models.SlugField(max_length=250, unique=True)
     description = models.TextField()
-    start_bid = models.DecimalField(max_digits=1000000, decimal_places=2,
+    start_bid = models.DecimalField(max_digits=9, decimal_places=2,
         validators=[MinValueValidator(Decimal('0.01'))])
     image = models.URLField(blank=True)
     is_active = models.BooleanField(default=True)

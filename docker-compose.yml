@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  db:
+    container_name: postgres
+    image: postgres:${PSQL_V}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${PSQL_DB}
+      - POSTGRES_USER=${PSQL_U}
+      - POSTGRES_PASSWORD=${PSQL_PASS}
+    ports:
+      - 5432:5432
+    restart: always
+
+  web:
+    container_name: cs-50_commerce
+    build: . -t cs-50-commerce:1.5
+    command: python manage.py runserver 0.0.0.0:8000
+    # command: >
+    #   sh -c "wait_for_db &&
+    #         python manage.py migrate &&
+    #         python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    # expose:
+    #   - 8000
+    ports:
+      - 8000:8000
+    environment:
+      - POSTGRES_NAME=${PSQL_NAME}
+      - POSTGRES_USER=${PSQL_U}
+      - POSTGRES_PASSWORD=${PSQL_PASS}
+    depends_on:
+      - db
+
+  nginx:
+    build: ./nginx
+    ports:
+      - 1337:80
+    depends_on:
+      - web
+
+volumes:
+  db-data:
