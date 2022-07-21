@@ -11,3 +11,4 @@ staticfiles/
 *.sqlite3
 *.bak
 media
+docker-compose.ci.yml
