@@ -20,9 +20,10 @@ from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("", include("auctions.urls")),
-    path("account/", include('account.urls'))
+    path('admin/', admin.site.urls),
+    path('', include('auctions.urls')),
+    path('account/', include('account.urls')),
+    path('api/v1/', include('auctions_api.urls')),
 ]
 
 if settings.DEBUG:
