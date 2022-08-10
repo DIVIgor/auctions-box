@@ -1,13 +1,7 @@
 from rest_framework import serializers
 
-from account.models import User
 from auctions.models import Category, Listing, Bid, Comment, Watchlist
 
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = '__all__'
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,6 +9,7 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
 class ListingSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
         model = Listing
         fields = ('id', 'category', 'user', 'name', 'description', 'image',

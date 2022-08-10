@@ -1,10 +1,12 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
+# from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from account.models import User
+from djoser.permissions import CurrentUserOrAdmin
+
 from auctions.models import Category, Listing, Bid, Comment, Watchlist
-from .serializers import (UserSerializer, CategorySerializer, ListingSerializer,
+from .serializers import (CategorySerializer, ListingSerializer,
     CommentSerializer, BidSerializer, WatchlistSerializer)
 
 
@@ -43,21 +45,18 @@ class ListingViewSet(viewsets.ModelViewSet):
         serializer = BidSerializer(queryset, many=True)
         return Response(serializer.data)
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    lookup_field = 'username'
+class WatchlistViewSet(viewsets.ModelViewSet):
+    serializer_class = WatchlistSerializer
+    permission_classes = (CurrentUserOrAdmin,)
 
-    @action(methods=['get', 'post', 'put', 'patch'], detail=True,
-        url_path='watchlist')
-    def watchlist(self, request, username=None):
-        queryset = Watchlist.objects.filter(user__username=username)
-        serializer = WatchlistSerializer(queryset, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        user = self.request.user
+        return Watchlist.objects.filter(user=user)
+    
+class BidViewSet(viewsets.ModelViewSet):
+    serializer_class = BidSerializer
+    permission_classes = (CurrentUserOrAdmin,)
 
-    @action(methods=['get'], detail=True,
-        url_path='bids')
-    def bid(self, request, username=None):
-        queryset = Bid.objects.filter(user__username=username)
-        serializer = BidSerializer(queryset, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        user = self.request.user
+        return Bid.objects.filter(user=user)
