@@ -9,11 +9,11 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
 class ListingSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
         model = Listing
         fields = ('id', 'category', 'user', 'name', 'description', 'image',
             'start_bid', 'date_added', 'date_updated')
+    # user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
