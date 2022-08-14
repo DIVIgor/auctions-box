@@ -32,15 +32,10 @@ class ListingViewSet(mixins.CreateModelMixin,
     serializer_class = ListingSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
-    # def retrieve(self, request, pk=None):
-    #     queryset = Listing.objects.filter(category__id=pk)
-    #     serializer = ListingSerializer(queryset, many=True)
-    #     return Response(serializer.data)
-
     def perform_update(self, serializer):
         """Permissions to update for owner and staff"""
         instance = self.get_object()
-        print(not self.request.user.is_staff)
+
         if self.request.user == instance.user or self.request.user.is_staff:
             serializer.save()
         else:
@@ -60,7 +55,11 @@ class ListingViewSet(mixins.CreateModelMixin,
         serializer = BidSerializer(queryset, many=True)
         return Response(serializer.data)
 
-class WatchlistViewSet(viewsets.ModelViewSet):
+class WatchlistViewSet(mixins.CreateModelMixin,
+                       mixins.RetrieveModelMixin,
+                       mixins.DestroyModelMixin,
+                       mixins.ListModelMixin,
+                       viewsets.GenericViewSet):
     serializer_class = WatchlistSerializer
     permission_classes = (CurrentUserOrAdmin,)
 
@@ -68,10 +67,31 @@ class WatchlistViewSet(viewsets.ModelViewSet):
         user = self.request.user
         return Watchlist.objects.filter(user=user)
     
-class BidViewSet(viewsets.ModelViewSet):
+class BidViewSet(mixins.CreateModelMixin,
+                 mixins.ListModelMixin,
+                 viewsets.GenericViewSet):
     serializer_class = BidSerializer
     permission_classes = (CurrentUserOrAdmin,)
 
     def get_queryset(self):
         user = self.request.user
         return Bid.objects.filter(user=user)
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    queryset = Comment.objects.all()
+    
+    def perform_update(self, serializer):
+        instance = self.get_object()
+
+        if self.request.user == instance.user or self.request.user.is_staff:
+            serializer.save()
+        else:
+            raise PermissionDenied('User is not allowed to do that.')
+
+    def perform_destroy(self, instance):
+        if self.request.user == instance.user or self.request.user.is_staff:
+            instance.delete()
+        else:
+            raise PermissionDenied('User is not allowed to do that.')
