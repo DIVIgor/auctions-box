@@ -76,6 +76,7 @@ DATABASES = {
         'PASSWORD': config('PSQL_PASS'),
         'HOST': config('PSQL_HOST'),
         'PORT': config('PSQL_PORT'),
+        'CONN_MAX_AGE': 500,
     }
 }
 
