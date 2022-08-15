@@ -27,9 +27,13 @@ body {
     background-color: #e3f3fd;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
     border-top: 1px solid #dfe6ff;
     font-size: 14px;
+}
+#footer_urls {
+    font-size: 16px;
+
 }
 button {
     font-family: Arial, Helvetica, sans-serif;

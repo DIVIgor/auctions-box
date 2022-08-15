@@ -5,7 +5,7 @@
     <head>
         <title>{% block title %}{% endblock title %}</title>
         <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
-        <link rel="icon" href="box-seam-white.svg" sizes="any">
+        <link rel="icon" href="{% static 'auctions/box-seam-white.svg' %}" sizes="any">
     </head>
     <body>
         <div class="header">
@@ -65,6 +65,9 @@
             {% block body %}{% endblock body %}
         </div>
         <div class="footer">
+            <div>
+                <a class="basic-link" id="footer_urls" href="{% url 'schema-swagger-ui' %}">API</a>
+            </div>
             <div>
                 Copyright © 2021-2022 AUCTIONS Inc. All Rights Reserved. Joking :)
             </div>
