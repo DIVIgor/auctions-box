@@ -1,4 +1,5 @@
 from django.core.exceptions import PermissionDenied
+from django.utils.text import slugify
 
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
@@ -31,6 +32,15 @@ class ListingViewSet(mixins.CreateModelMixin,
     queryset = Listing.objects.all()
     serializer_class = ListingSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def perform_create(self, serializer):
+        listing_id = self.queryset.filter(category=serializer.validated_data['category']).count() + 1
+        title = serializer.validated_data['name']
+
+        serializer.save(
+            user=self.request.user,
+            slug=slugify(f'{title}_{listing_id}')
+        )
 
     def perform_update(self, serializer):
         """Permissions to update for owner and staff"""
@@ -66,6 +76,11 @@ class WatchlistViewSet(mixins.CreateModelMixin,
     def get_queryset(self):
         user = self.request.user
         return Watchlist.objects.filter(user=user)
+
+    def perform_create(self, serializer):
+        if self.get_queryset().filter(listing=self.request.data['listing']):
+            raise PermissionDenied('Already in watchlist.')
+        serializer.save(user=self.request.user)
     
 class BidViewSet(mixins.CreateModelMixin,
                  mixins.ListModelMixin,
@@ -77,10 +92,16 @@ class BidViewSet(mixins.CreateModelMixin,
         user = self.request.user
         return Bid.objects.filter(user=user)
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = Comment.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
     
     def perform_update(self, serializer):
         instance = self.get_object()
