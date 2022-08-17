@@ -17,11 +17,11 @@
                     AUCTIONS
                 </a>
             </div>
+            <input id="nav-toggle" type="checkbox" />
+            <label class="nav-button-container" for="nav-toggle">
+                <div class="nav-button"></div>
+            </label>
             <div class="right-nav">
-                <input id="nav-toggle" type="checkbox" />
-                <label class="nav-button-container" for="nav-toggle">
-                    <div class="nav-button"></div>
-                </label>
                 <ul class="nav">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'auctions:categories' %}">Categories</a>
@@ -44,17 +44,21 @@
                 <ul class="signed-in-info">
                     {% if user.is_authenticated %}
                         <li class="signed-in-item">
-                            Signed in as <strong>{{ user.username }}</strong>
+                            <strong>{{ user.username }}</strong>
                         </li>
                         <li class="signed-in-item">
-                            <a class="nav-link" href="{% url 'account:logout' %}">Log Out</a>
+                            <a class="nav-link" href="{% url 'account:logout' %}">
+                                Log Out
+                            </a>
                         </li>
                     {% else %}
                         <li class="signed-in-item">
-                            <a class="nav-link" href="{% url 'account:login' %}">Log in</a>
+                            <a class="nav-link" href="{% url 'account:register' %}">Register</a>
                         </li>
                         <li class="signed-in-item">
-                            <a class="nav-link" href="{% url 'account:register' %}">Register</a>
+                            <a class="nav-link" href="{% url 'account:login' %}">
+                                Log In
+                            </a>
                         </li>
                     {% endif %}
                 </ul>

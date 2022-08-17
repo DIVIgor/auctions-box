@@ -31,11 +31,11 @@
                         <form id="id-bid-form" method="POST">
                             {% csrf_token %}
                             {{ bid_form.bid }}
-                            <button id="make-bid" type="submit" name="bid_submit" value="bid">Place bid</button>
+                            <button id="make-bid" type="submit" name="bid_submit" value="bid">Bid</button>
                         </form>
                     {% endif %}
                 {% elif user == current_bid_owner and listing.is_active %}
-                    <h3>Your bid is the highest</h3>
+                    <h3>Your bid leads</h3>
                 {% elif user == listing_owner and listing.is_active %}
                     <a id="gla-btn" href="{% url 'auctions:close_listing' cat_slug listing_slug %}">Close listing</a>
                 {% endif %}
@@ -50,9 +50,9 @@
                 <div class="watchlist">
                     <a id="gla-btn" href="{% url 'auctions:watch' cat_slug listing_slug %}">
                         {% if in_watchlist %}
-                            Delete from watchlist
+                            Watch
                         {% else %}
-                            Add to watchlist
+                            Unwatch
                         {% endif %}
                     </a>
                 </div>
