@@ -10,7 +10,11 @@ from djoser.permissions import CurrentUserOrAdmin
 
 from auctions.models import Category, Listing, Bid, Comment, Watchlist
 from .serializers import (CategorySerializer, ListingSerializer,
-    CommentSerializer, BidSerializer, WatchlistSerializer)
+                          CommentSerializer, BidSerializer,
+                          WatchlistSerializer)
+from .pagination import (ListingSetPagination, UserSetPagination, 
+                         BidSetPagination, CommentSetPagination,
+                         WatchlistPagination)
 
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
@@ -32,6 +36,7 @@ class ListingViewSet(mixins.CreateModelMixin,
     queryset = Listing.objects.all()
     serializer_class = ListingSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    pagination_class = ListingSetPagination
 
     def perform_create(self, serializer):
         listing_id = self.queryset.filter(category=serializer.validated_data['category']).count() + 1
@@ -72,6 +77,7 @@ class WatchlistViewSet(mixins.CreateModelMixin,
                        viewsets.GenericViewSet):
     serializer_class = WatchlistSerializer
     permission_classes = (CurrentUserOrAdmin,)
+    pagination_class = WatchlistPagination
 
     def get_queryset(self):
         user = self.request.user
@@ -87,6 +93,7 @@ class BidViewSet(mixins.CreateModelMixin,
                  viewsets.GenericViewSet):
     serializer_class = BidSerializer
     permission_classes = (CurrentUserOrAdmin,)
+    pagination_class = BidSetPagination
 
     def get_queryset(self):
         user = self.request.user
@@ -99,6 +106,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = Comment.objects.all()
+    pagination_class = CommentSetPagination
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
