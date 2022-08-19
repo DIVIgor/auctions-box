@@ -84,7 +84,7 @@ class WatchlistViewSet(mixins.CreateModelMixin,
         return Watchlist.objects.filter(user=user)
 
     def perform_create(self, serializer):
-        if self.get_queryset().filter(listing=self.request.data['listing']):
+        if self.get_queryset().filter(listing=serializer.validated_data['listing']):
             raise PermissionDenied('Already in watchlist.')
         serializer.save(user=self.request.user)
     
@@ -100,6 +100,14 @@ class BidViewSet(mixins.CreateModelMixin,
         return Bid.objects.filter(user=user)
 
     def perform_create(self, serializer):
+        queryset = self.get_queryset()
+        listing = serializer.validated_data['listing']
+        default_bid = Listing.objects.get(name=listing).start_bid
+        users_maxbid = queryset.filter(listing=listing).order_by('-bid')[0].bid if queryset.filter(listing=listing) else 0
+
+        if serializer.validated_data['bid'] < max(default_bid, users_maxbid):
+            raise PermissionDenied('Wrong bid value.')
+            
         serializer.save(user=self.request.user)
 
 class CommentViewSet(viewsets.ModelViewSet):
