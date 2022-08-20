@@ -100,8 +100,11 @@ class BidViewSet(mixins.CreateModelMixin,
         return Bid.objects.filter(user=user)
 
     def perform_create(self, serializer):
-        queryset = self.get_queryset()
         listing = serializer.validated_data['listing']
+        if listing.user == self.request.user:
+            raise PermissionDenied('User cannot bid own listings.')
+
+        queryset = self.get_queryset()
         default_bid = Listing.objects.get(name=listing).start_bid
         users_maxbid = queryset.filter(listing=listing).order_by('-bid')[0].bid if queryset.filter(listing=listing) else 0
 
