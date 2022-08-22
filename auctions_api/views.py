@@ -1,4 +1,3 @@
-from tkinter import N
 from django.core.exceptions import PermissionDenied
 from django.utils.text import slugify
 
