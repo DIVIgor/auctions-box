@@ -1,3 +1,4 @@
+from tkinter import N
 from django.core.exceptions import PermissionDenied
 from django.utils.text import slugify
 
@@ -12,9 +13,8 @@ from auctions.models import Category, Listing, Bid, Comment, Watchlist
 from .serializers import (CategorySerializer, ListingSerializer,
                           CommentSerializer, BidSerializer,
                           WatchlistSerializer)
-from .pagination import (ListingSetPagination, UserSetPagination, 
-                         BidSetPagination, CommentSetPagination,
-                         WatchlistPagination)
+from .pagination import (ListingSetPagination, BidSetPagination, 
+                         CommentSetPagination, WatchlistPagination)
 
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
@@ -105,12 +105,31 @@ class BidViewSet(mixins.CreateModelMixin,
             raise PermissionDenied('User cannot bid own listings.')
 
         queryset = self.get_queryset()
-        default_bid = Listing.objects.get(name=listing).start_bid
-        users_maxbid = queryset.filter(listing=listing).order_by('-bid')[0].bid if queryset.filter(listing=listing) else 0
+        start_bid = listing.start_bid
+        current_bid = max(start_bid, queryset.filter(listing=listing).order_by\
+            ('-bid')[0].bid) if queryset.filter(listing=listing) else start_bid
 
-        if serializer.validated_data['bid'] < max(default_bid, users_maxbid):
+        if serializer.validated_data['bid'] < current_bid:
             raise PermissionDenied('Wrong bid value.')
-            
+
+
+        # Raw query (An issue with results. pgAdmin returns the correct value while django on server and in shell - wrong)
+        # current_bid = Bid.objects.raw(f"""
+        #     SELECT id, (SELECT MAX(bids)
+        #         FROM (VALUES (start_bid), (users_maxbid)) AS listing_bids(bids)) AS curr_bid
+        #     FROM auctions_listing
+        #     JOIN (
+        #         SELECT listing_id, MAX(bid) AS users_maxbid
+        #         FROM auctions_bid
+        #         WHERE user_id={self.request.user.id} AND listing_id={listing.id}
+        #         GROUP BY listing_id, user_id
+        #     ) AS maxbid ON auctions_listing.id = maxbid.listing_id
+        #     WHERE id={listing.id}
+        # """)
+
+        # if serializer.validated_data['bid'] < current_bid[0].bid:
+        #     raise PermissionDenied('Wrong bid value.')
+
         serializer.save(user=self.request.user)
 
 class CommentViewSet(viewsets.ModelViewSet):
