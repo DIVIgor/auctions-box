@@ -63,12 +63,13 @@ class GetListing(DetailView, View):
         context['listing_owner'] = self.object.user
         context['comments'] = self.object.comment_set.order_by('-date_added')
 
-        if self.request.user.is_authenticated:
-            user_bids = self.object.bid_set.order_by('-date_added')
-            if user_bids:
-                context['current_bid'] = user_bids[0].bid
-                context['current_bid_owner'] = user_bids[0].user
+        bids = self.object.bid_set.order_by('-bid')
+        if bids:
+            context['current_bid'] = bids[0].bid
+            context['current_bid_owner'] = bids[0].user
+            context['bid_count'] = len(bids)
 
+        if self.request.user.is_authenticated:
             context['in_watchlist'] = User.objects.get(
                 username=self.request.user).watchlist_set.filter(listing=self.object)
             
@@ -76,8 +77,8 @@ class GetListing(DetailView, View):
 
             is_author = self.request.user == context['listing_owner']
             is_last_bidder = False
-            if user_bids:
-                is_last_bidder =  user_bids[0] == self.request.user
+            if bids:
+                is_last_bidder =  bids[0] == self.request.user
             
             if not is_author and not is_last_bidder and self.object.is_active:
                 bid_form = self.bid_form_class()

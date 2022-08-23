@@ -19,9 +19,16 @@
         <div class="lg-actions">
             <div class="cur-bid">
                 {% if current_bid %}
-                    Current bid: <span id="price">US ${{ current_bid }}</span>
+                    <div>Current bid: <span id="price">US ${{ current_bid }}</span></div>
+                    <div>{{ bid_count }}
+                        {% if bid_count == 1 %}
+                            bid
+                        {% elif bid_count > 1 %}
+                            bids
+                        {% endif %}
+                    </div>
                 {% else %}
-                    Starting bid: <span id="price">US ${{ start_bid }}</span>
+                    <div>Starting bid: <span id="price">US ${{ start_bid }}</span></div>
                 {% endif %}
             </div>
     

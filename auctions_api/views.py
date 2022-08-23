@@ -123,7 +123,7 @@ class BidViewSet(mixins.CreateModelMixin,
         #         WHERE user_id={self.request.user.id} AND listing_id={listing.id}
         #         GROUP BY listing_id, user_id
         #     ) AS maxbid ON auctions_listing.id = maxbid.listing_id
-        #     WHERE id={listing.id}
+        #     WHERE auctions_listing.id={listing.id}
         # """)
 
         # if serializer.validated_data['bid'] < current_bid[0].bid:
