@@ -7,20 +7,24 @@
 
     {% if watchlist %}
         <div class="wlst">
-            {% for watching in watchlist %}
-                <a class="wlst-url" href="{{ watching.listing.get_absolute_url }}">
+            {% for listing in watchlist %}
+                <a class="wlst-url" href="{{ listing.get_absolute_url }}">
                     <div class="wlst-img">
-                        {% if watching.listing.image %}
-                            <img class="wlst-img" src="{{ watching.listing.image }}" alt="{{ watching.listing.name }}">
+                        {% if listing.image %}
+                            <img class="wlst-img" src="{{ listing.image }}" alt="{{ listing.name }}">
                         {% else %}
                             <img class="wlst-img" src="https://media.istockphoto.com/vectors/default-image-icon-vector-missing-picture-page-for-website-design-or-vector-id1357365823?b=1&k=20&m=1357365823&s=170667a&w=0&h=y6ufWZhEt3vYWetga7F33Unbfta2oQXCZLUsEa67ydM=" alt="No image available">
                         {% endif %}
                     </div>
                     <div class="lst-name">
-                        {{ watching.listing.name }}
+                        {{ listing.name }}
                     </div>
                     <div class="lst-bid">
-                        US ${{ watching.listing.start_bid }}
+                        {% if listing.current_bid %}
+                            <small>Current bid:</small> US ${{ listing.current_bid }}
+                        {% else %}
+                            <small>Starting bid:</small> US ${{ listing.start_bid }}
+                        {% endif %}
                     </div>
                 </a>
             {% endfor %}

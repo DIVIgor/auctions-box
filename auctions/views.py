@@ -1,9 +1,10 @@
 from copy import copy
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils.text import slugify
-
+from django.db.models import Max
 from django.views.generic import (ListView, DetailView, View, 
     FormView, RedirectView, CreateView)
 
@@ -18,7 +19,8 @@ class IndexView(ListView):
     context_object_name = 'active_listings'
 
     def get_queryset(self):
-        return Listing.objects.filter(is_active=True).order_by('-date_added')
+        return self.model.objects.filter(is_active=True).order_by('-date_added')\
+            .annotate(current_bid=Max('bid__bid'))
 
 
 class GetCategories(ListView):
@@ -27,7 +29,7 @@ class GetCategories(ListView):
     context_object_name = 'categories'
 
     def get_queryset(self):
-        return Category.objects.order_by('name')
+        return self.model.objects.order_by('name')
 
 
 class GetListingsByCat(ListView):
@@ -36,7 +38,8 @@ class GetListingsByCat(ListView):
     context_object_name = 'listings'
 
     def get_queryset(self):
-        return Listing.objects.filter(category__slug=self.kwargs['cat_slug'], is_active=True).order_by('-date_added')
+        return self.model.objects.filter(category__slug=self.kwargs['cat_slug'],\
+            is_active=True).order_by('-date_added').annotate(current_bid=Max('bid__bid'))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -117,11 +120,16 @@ class GetUsersListings(ListView):
     template_name = 'auctions/users_listings.html'
     context_object_name = 'users_listings'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['user'] = get_object_or_404(User, username=self.request.user)
-        context['users_listings'] = context['user'].listing_set.order_by('-date_added')
-        return context
+    def get_queryset(self):
+        return Listing.objects.filter(user=get_object_or_404(User, \
+            username=self.request.user)).order_by('-date_added')\
+            .annotate(current_bid=Max('bid__bid'))
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['user'] = get_object_or_404(User, username=self.request.user)
+    #     context['users_listings'] = context['user'].listing_set.order_by('-date_added')
+    #     return context
 
 
 class GetBidding(ListView):
@@ -160,7 +168,10 @@ class GetWatchlist(ListView):
     context_object_name = 'watchlist'
 
     def get_queryset(self):
-        return self.model.objects.filter(user=self.request.user).order_by('-date_added')
+        return Listing.objects.filter(watchlist__user=get_object_or_404(User, username=self.request.user)).order_by('-date_added')\
+            .annotate(current_bid=Max('bid__bid'))
+        # return self.model.objects.filter(user=self.request.user).order_by('-date_added')\
+        #     .annotate(current_bid=Max('bid__bid'))
 
 
 class AddToWatchlist(RedirectView):

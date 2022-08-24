@@ -20,7 +20,11 @@
                         {{ listing.name }}
                     </div>
                     <div class="lst-bid">
-                        <small>Your bid:</small> US ${{ listing.start_bid }}
+                        {% if listing.current_bid %}
+                            <small>Current bid:</small> US ${{ listing.current_bid }}
+                        {% else %}
+                            <small>Starting bid:</small> US ${{ listing.start_bid }}
+                        {% endif %}
                     </div>
                 </a>
             {% endfor %}
