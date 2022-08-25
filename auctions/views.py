@@ -14,6 +14,7 @@ from .forms import ListingForm, BidForm, CommentForm
 
 
 class IndexView(ListView):
+    paginate_by = 15
     model = Listing
     template_name = 'auctions/index.html'
     context_object_name = 'active_listings'
@@ -33,6 +34,7 @@ class GetCategories(ListView):
 
 
 class GetListingsByCat(ListView):
+    paginate_by = 15
     model = Listing
     template_name = 'auctions/listings_by_cat.html'
     context_object_name = 'listings'
@@ -116,6 +118,7 @@ class GetListing(DetailView, View):
         return self.get_context_data(**context)
 
 class GetUsersListings(ListView):
+    paginate_by = 20
     model = User
     template_name = 'auctions/users_listings.html'
     context_object_name = 'users_listings'
@@ -133,6 +136,7 @@ class GetUsersListings(ListView):
 
 
 class GetBidding(ListView):
+    paginate_by = 20
     model = User
     template_name = 'auctions/bidding.html'
     # context_object_name = 'bids'
@@ -163,6 +167,7 @@ class AddListing(FormView):
 
 
 class GetWatchlist(ListView):
+    paginate_by = 20
     model = Watchlist
     template_name = 'auctions/watchlist.html'
     context_object_name = 'watchlist'

@@ -68,6 +68,47 @@
         <div class="body">
             {% block body %}{% endblock body %}
         </div>
+        {% if page_obj.has_other_pages %}
+                <div class="pagination">
+                    <ul class="content-pages">
+                        {% if page_obj.number|add:-2 > 1 %}
+                            <li class="page-num">
+                                <a href="?page=1" class="basic-link">1</a>
+                            </li>
+                            <li class="three-dots">
+                                {% comment %} ... {% endcomment %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgba(27, 73, 101, 0.6)" class="bi bi-three-dots" viewBox="0 0 16 3">
+                                    <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                                </svg>
+                            </li>
+                        {% endif %}
+                        {% for page in page_obj.paginator.page_range %}
+                            {% if page_obj.number == page %}
+                                <li class="curr-page-num">
+                                    {{ page }}
+                                </li>                                
+                            {% elif page >= page_obj.number|add:-2 and page <= page_obj.number|add:2 %}
+                                <li class="page-num">
+                                    <a href="?page={{ page }}" class="basic-link">
+                                        {{ page }}
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if page_obj.number|add:2 < page_obj.paginator.num_pages %}
+                            <li class="three-dots">
+                                {% comment %} ... {% endcomment %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgba(27, 73, 101, 0.6)" class="bi bi-three-dots" viewBox="0 0 16 3">
+                                    <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                                </svg>
+                            </li>
+                            <li class="page-num">
+                                <a href="?page={{ page_obj.paginator.num_pages }}" class="basic-link">{{ page_obj.paginator.num_pages }}</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            {% endif %}
         <div class="footer">
             <div>
                 <a class="basic-link" id="footer_urls" href="{% url 'schema-swagger-ui' %}">API</a>
