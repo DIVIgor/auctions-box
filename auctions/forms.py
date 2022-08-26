@@ -16,6 +16,7 @@ class ListingForm(forms.ModelForm):
             'description': 'Description', 'start_bid': 'Start bid',
             'image': 'Image URL'
         }
+        field_order = ['name', ]
 
 class BidForm(forms.ModelForm):
     class Meta:

@@ -240,7 +240,7 @@ button {
     padding-right: 10px;
 }
 .body {
-    margin: 1% 15%;
+    margin: 2% 15%;
 }
 .page-title {
     font-size: 30px;
@@ -423,15 +423,15 @@ p.descr {
     margin: 5% 0;
     display: grid;
     grid-template-columns: 100%;
-    grid-auto-rows: 228px;
+    grid-auto-rows: 230px;
     gap: 15px;
 }
 .wlst-url {
     display: grid;
     grid-template-columns: 300px auto;
     grid-template-rows: 50px auto;
-    /* border: 1px solid #dfe6ff;
-    border-radius: 6px; */
+    border: 1px solid #dfe6ff;
+    border-radius: 6px;
     /* background-color: #eff9ff; */
 }
 .wlst-url:hover {

@@ -30,7 +30,7 @@ class GetCategories(ListView):
     context_object_name = 'categories'
 
     def get_queryset(self):
-        return self.model.objects.order_by('name')
+        return self.model.objects.all()
 
 
 class GetListingsByCat(ListView):
