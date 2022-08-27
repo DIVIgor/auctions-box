@@ -3,7 +3,10 @@
 {% block title %}{{ category }}{% endblock title %}
 
 {% block body %}
-<h1 class="page-title">{{ category }}</h1>
+    <div class="basic-title">
+        <h1 class="page-title">{{ category }}</h1>
+    </div>
+    
 {% if listings %}
     <div class="active_listings">
         {% for listing in listings %}

@@ -3,8 +3,10 @@
 {% block title %}Bidding{% endblock title %}
 
 {% block body %}
-    <h1 class="page-title">My bids</h1>
-
+    <div class="basic-title">
+        <h1 class="page-title">My bids</h1>
+    </div>
+    
     {% if bids %}
         <div class="wlst">
             {% for bid in bids %}

@@ -3,8 +3,10 @@
 {% block title %}Add listing{% endblock title %}
 
 {% block body %}
-    <h1 class="page-title">Add listing</h1>
-
+    <div class="basic-title">
+        <h1 class="page-title">Add listing</h1>
+    </div>
+    
     <div class="form-field">
         <form action="{% url 'auctions:add_listing' %}" method='POST'>
             {% csrf_token %}

@@ -3,14 +3,19 @@
 {% block title %}Categories{% endblock title %}
 
 {% block body %}
-    <h1 class="page-title">Categories</h1>
-    {% if categories %}
-        <ul class="basic-ul">
-            {% for cat in categories %}
-                <li><a class="basic-link" href="{{ cat.get_absolute_url }}">{{ cat }}</a></li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>Sorry, this page is empty.</p>
-    {% endif %}
+    <div class="basic-title">
+        <h1 class="page-title">Categories</h1>
+    </div>
+    
+    <div class="cat-list">
+        {% if categories %}
+            <ul class="basic-ul">
+                {% for cat in categories %}
+                    <li><a class="basic-link" href="{{ cat.get_absolute_url }}">{{ cat }}</a></li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Sorry, this page is empty.</p>
+        {% endif %}
+    </div>
 {% endblock body %}

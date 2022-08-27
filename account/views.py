@@ -4,6 +4,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
+from django.views.generic import DetailView, FormView
+
 from .models import User
 
 
@@ -55,3 +57,18 @@ def register(request):
         return HttpResponseRedirect(reverse("auctions:index"))
     else:
         return render(request, "account/register.html")
+
+
+class UserView(DetailView):
+    model = User
+    template_name = 'account/user_details.html'
+    context_object_name = 'user_details'
+    queryset = model.objects.all()
+
+    def get_object(self, queryset=queryset):
+        return self.request.user
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        return context
