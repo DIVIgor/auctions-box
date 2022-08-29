@@ -7,10 +7,10 @@
         <h1 class="page-title card-title">Account info</h1>
 
         <div class="info-grid">
-            <div class="param"><span>Account name</span></div>
+            <div class="param"><span>Account name:</span></div>
             <div class="value">{{ user_details.username }}</div>
 
-            <div class="param"><span>First name</span></div>
+            <div class="param"><span>First name:</span></div>
             <div class="value">
                 {% if user_details.first_name %}
                     {{ user_details.first_name }}
@@ -19,7 +19,7 @@
                 {% endif %}
             </div>
 
-            <div class="param"><span>Last name</span></div>
+            <div class="param"><span>Last name:</span></div>
             <div class="value">
                 {% if user_details.last_name %}
                     {{ user_details.last_name }}
@@ -28,7 +28,7 @@
                 {% endif %}
             </div>
 
-            <div class="param"><span>E-mail</span></div>
+            <div class="param"><span>E-mail:</span></div>
             <div class="value">{{ user_details.email }}</div>
         </div>
 
