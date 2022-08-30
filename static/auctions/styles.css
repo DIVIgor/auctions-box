@@ -270,11 +270,40 @@ a {
     font-weight: 400;
 }
 
+.help-text {
+    border: 1px solid #a0b4ff4a;
+    border-radius: 4px;
+    background-color: #a0b4ff1e;
+    margin-bottom: 29px;
+}
+/* .help-text > ul > li {
+    font-size: 14px;
+} */
+.errors {
+    border: 1px solid #ffa0a04a;
+    border-radius: 4px;
+    background-color: #ffa0a01a;
+}
+.field-errors-ul, .help-text > ul {
+    font-size: 16px;
+    /* padding: 3px 0; */
+    margin: 10px;
+}
+.field-errors-ul > li, .help-text > ul > li {
+    margin: 7px 0;
+    font-size: 14px;
+}
+.msg {
+    margin: 10px;
+}
 
 .basic-title {
     margin-left: 2%;
 }
 
+.lg-add-comment {
+    margin-bottom: 2%;
+}
 
 /* Active listings page */
 .active_listings {
@@ -586,7 +615,7 @@ textarea:focus {
 }
 .card-title {
     text-align: center;
-    margin-bottom: 10%;
+    margin-bottom: 6%;
 }
 .form-group {
     margin-bottom: 30px;
@@ -736,6 +765,7 @@ summary:hover {
 }
 #comments-header {
     border-bottom: 1px solid #dfe6ff;
+    margin-bottom: 2%;
 }
 .comment {
     background-color: #eff9ff;

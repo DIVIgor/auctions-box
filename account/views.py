@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.views import PasswordChangeView
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -72,3 +73,6 @@ class UserView(DetailView):
         context = super().get_context_data(**kwargs)
 
         return context
+
+class ChangePassView(PasswordChangeView):
+    template_name = "account/change_password.html"

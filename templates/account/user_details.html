@@ -39,38 +39,10 @@
                 </a>
             </div>
             <div class="second-btn">
-                <a id="gla-btn" href="#">
+                <a id="gla-btn" href="{% url 'account:change_pass' %}">
                     Change password
                 </a>
             </div>
         </div>
     </div>
-    
-    {% comment %} <div class="reg-log-card">
-        <h1 class="page-title">Log In</h1>
-
-        {% if message %}
-            <div>{{ message }}</div>
-        {% endif %}
-        
-        <form action="{% url 'account:login' %}" method="post">
-            {% csrf_token %}
-            <div class="form-group">
-                <div class="field-label">
-                    <label for="username">Username</label>
-                </div>
-                <input autofocus class="form-control" type="text" name="username" placeholder="Username">
-            </div>
-            <div class="form-group">
-                <div class="field-label">
-                    <label for="username">Password</label>
-                </div>
-                <input class="form-control" type="password" name="password" placeholder="Password">
-            </div>
-            <input class="reg-login-btn" type="submit" value="Log In">
-        </form>
-        <div class="acc-redirect">
-            Don't have an account? <a href="{% url 'account:register' %}">Register here</a>
-        </div>
-    </div> {% endcomment %}
 {% endblock %}
