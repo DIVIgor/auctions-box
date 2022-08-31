@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.views import PasswordChangeView
+from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
+from django.contrib.auth.forms import UserChangeForm
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -76,3 +77,9 @@ class UserView(DetailView):
 
 class ChangePassView(PasswordChangeView):
     template_name = "account/change_password.html"
+
+class ChangePassDoneView(PasswordChangeDoneView):
+    template_name = "account/password_change_done.html"
+
+# class ChangeInfoView(FormView, UserChangeForm):
+

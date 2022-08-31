@@ -279,6 +279,12 @@ a {
 /* .help-text > ul > li {
     font-size: 14px;
 } */
+.succeed-msg {
+    padding: 10px;
+    border: 1px solid #4ed64e2a;
+    border-radius: 4px;
+    background-color: #4ed64e0e;
+}
 .errors {
     border: 1px solid #ffa0a04a;
     border-radius: 4px;
