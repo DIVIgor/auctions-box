@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+
+{% block title %}Change info{% endblock title %}
+
+{% block body %}
+    <div class="reg-log-card">
+        <h1 class="page-title card-title">Change info</h1>
+
+        {% if errorlist %}
+            <div>{{ errorlist }}</div>
+        {% endif %}
+
+        <div class="reg-log-form">
+            <form action="{% url 'account:change_info' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <div class="field-label">
+                        <label for="username">Username</label>
+                    </div>
+                    <input class="form-control" type="text" name="username" value={{ request.user }} readonly="readonly" disabled="disabled">
+                </div>
+                <div class="form-group">
+                    <div class="field-label">
+                        <label for="first_name">First name</label>
+                    </div>
+                    {% if form.first_name.errors %}
+                        <div class="field-label errors">
+                            <ul class="field-errors-ul">
+                                {% for error in form.first_name.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    <input class="form-control" type="text" name="first_name" maxlength="150" placeholder="First name" value={{ form.first_name.value }}>
+                </div>
+                <div class="form-group">
+                    <div class="field-label">
+                        <label for="last_name">Last name</label>
+                    </div>
+                    {% if form.last_name.errors %}
+                        <div class="field-label errors">
+                            <ul class="field-errors-ul">
+                                {% for error in form.last_name.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    <input class="form-control" type="text" name="last_name" maxlength="150" placeholder="Last name" value={{ form.last_name.value }}>
+                </div>
+                <div class="form-group">
+                    <div class="field-label">
+                        <label for="email">E-mail</label>
+                    </div>
+                    {% if form.email.errors %}
+                        <div class="field-label errors">
+                            <ul class="field-errors-ul">
+                                {% for error in form.email.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    <input class="form-control" type="email" name="email" value={{ form.email.value }}>
+                </div>
+                <input class="reg-login-btn" type="submit" value="Save changes">
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,14 +1,15 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
-from django.contrib.auth.forms import UserChangeForm
+# from django.contrib.auth.forms import UserChangeForm
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from django.views.generic import DetailView, FormView
+from django.views.generic import DetailView, FormView, UpdateView
 
 from .models import User
+from .forms import BasicUserChangeForm
 
 
 def login_view(request):
@@ -81,5 +82,13 @@ class ChangePassView(PasswordChangeView):
 class ChangePassDoneView(PasswordChangeDoneView):
     template_name = "account/password_change_done.html"
 
-# class ChangeInfoView(FormView, UserChangeForm):
+class ChangeInfoView(UpdateView):
+    model = User
+    template_name = "account/change_info.html"
+    # queryset = User.objects.all()
+    form_class = BasicUserChangeForm
+    success_url = 'details'
+
+    def get_object(self):
+        return self.request.user
 
