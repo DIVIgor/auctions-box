@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
 from .models import Listing, Bid, Comment
 
@@ -33,9 +34,14 @@ class BidForm(forms.ModelForm):
         current_bid = bids[0].bid if bids else start_bid
 
         if new_bid <= current_bid:
-            raise forms.ValidationError(
-                "Your bid must be higher than previous"
-            )
+            self._errors['bid'] = self.error_class([
+                'Bid must be higher than current.'])
+            # raise forms.ValidationError(
+            #     _('Invalid value: %(value)s'),
+            #     code='invalid',
+            #     params={'value': '42'},
+            # )
+        return self.cleaned_data
 
 class CommentForm(forms.ModelForm):
     class Meta:

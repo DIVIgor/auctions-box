@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils.text import slugify
 from django.db.models import Max
+# from django.views.generic.edit import FormMixin
 from django.views.generic import (ListView, DetailView, View, 
     FormView, RedirectView, CreateView)
 
@@ -91,16 +92,14 @@ class GetListing(DetailView, View):
 
         return context
 
-    # Needs the form validation improvement
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
         context = {}
-        # is_author = request.user == kwargs['listing_owner']
-
         post_data = copy(self.request.POST)
-        post_data['listing'] = self.get_object()
+        post_data['listing'] = self.object
         
-        if 'bid_submit' in request.POST: #and not is_author:
+        if 'bid_submit' in request.POST:
             form = self.bid_form_class(post_data)
         elif 'comment_submit' in request.POST:
             form = self.comment_form_class(post_data)
@@ -108,14 +107,16 @@ class GetListing(DetailView, View):
         if form.is_valid():
             form_data = form.save(commit=False)
             form_data.user = self.request.user
-            form_data.listing = post_data['listing']
+            form_data.listing = self.object
             form_data.save()
-            return redirect(post_data['listing'].get_absolute_url())
-        elif type(form) == BidForm:
+            return redirect(self.object.get_absolute_url())
+        elif type(form) == BidForm and not form.is_valid():
             context['bid_form'] = form
-        elif type(form) == CommentForm:
+        elif type(form) == CommentForm and not form.is_valid():
             context['comment_form'] = form
-        return self.get_context_data(**context)
+        print(self.get_context_data(**context))
+        return self.render_to_response(self.get_context_data(**context))
+
 
 class GetUsersListings(ListView):
     paginate_by = 20
@@ -163,7 +164,7 @@ class AddListing(FormView):
         listing_id = Listing.objects.filter(category=listing.category).count() + 1
         listing.slug = slugify(f'{listing.name}_{listing_id}')
         listing.save()
-        return redirect(listing.get_absolute_url())    
+        return redirect(listing.get_absolute_url())
 
 
 class GetWatchlist(ListView):
