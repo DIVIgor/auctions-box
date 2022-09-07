@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block title %}Search results{% endblock title %}
+
+{% block body %}
+    <div class="basic-title">
+        <h1 class="page-title">Search results</h1>
+    </div>
+
+    {% if listing_search %}
+        <div class="active_listings">
+            {% for listing in listing_search %}
+                <a class="listing_mini" href="{{ listing.get_absolute_url }}">
+                    <div class="lst-img">
+                        {% if listing.image %}
+                            <img class="limg" src="{{ listing.image }}" alt="{{ listing.name }}">
+                        {% else %}
+                            <img class="limg" src="https://media.istockphoto.com/vectors/default-image-icon-vector-missing-picture-page-for-website-design-or-vector-id1357365823?b=1&k=20&m=1357365823&s=170667a&w=0&h=y6ufWZhEt3vYWetga7F33Unbfta2oQXCZLUsEa67ydM=" alt="No image available">
+                        {% endif %}
+                    </div>
+                    <div class="lst-name">
+                        {{ listing.name }}
+                    </div>
+                    <div class="lst-bid">
+                        {% if listing.current_bid %}
+                            <small>Current bid:</small> US ${{ listing.current_bid }}
+                        {% else %}
+                            <small>Starting bid:</small> US ${{ listing.start_bid }}
+                        {% endif %}
+                    </div>
+                    <div class="lst-descr">
+                        <h4 class="h4-descr">Description</h4>
+                        <p class="descr">
+                            {{ listing.description }}
+                        </p>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        Sorry, we haven't found anything relevant to <b>{{ request.GET.q }}</b>.
+    {% endif %}
+{% endblock %}

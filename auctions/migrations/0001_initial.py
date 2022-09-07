@@ -25,6 +25,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'verbose_name_plural': 'Categories',
+                'ordering': ['name'],
             },
         ),
         migrations.CreateModel(

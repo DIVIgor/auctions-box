@@ -94,6 +94,35 @@ body {
     display: contents;
 }
 
+.nav-srch {
+    flex-grow: 1;
+}
+.srch-form {
+    display: flex;
+}
+.srch-fld {
+    margin: 2px 0 2px 2px;
+    border-right: none;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    font-size: 17px;
+}
+.srch-btn {
+    margin: 2px 2px 2px 0;
+    width: auto;
+    border: none;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    background-color: #caebff73;
+    color: white;
+    font-size: 17px;
+}
+.srch-btn:hover {
+    background-color: #27526d;
+    border: none;
+    box-shadow: -1px 0px 4px #d4deff;;
+}
+
 @media
 (max-width: 320px),
 (max-width: 700px),
@@ -163,6 +192,19 @@ body {
         padding: 0.5em 0;
         width: 100%;
         background-color: rgba(27, 73, 101, 0.95);
+    }
+    .srch-form {
+        height: 100%;
+        width: 85%;
+    }
+    .srch-fld {
+        height: 100%;
+        font-size: 25px;
+    }
+    .srch-btn {
+        height: 100%;
+        width: 35%;
+        font-size: 25px;
     }
 }
 

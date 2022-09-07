@@ -40,6 +40,12 @@
                             <a class="nav-link" href="{% url 'auctions:add_listing' %}">Add listing</a>
                         </li>
                     {% endif %}
+                    <li class="nav-srch nav-item">
+                        <form class="srch-form" action="{% url 'auctions:search_listing' %}" method='GET'>
+                            <input class="srch-fld" type="text" name="q" value="{{ request.GET.q }}" placeholder="Enter your request here">
+                            <input class="srch-btn" type="submit" value="Search">
+                        </form>
+                    </li>
                 </ul>
                 <ul class="signed-in-info">
                     {% if user.is_authenticated %}

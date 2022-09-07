@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils.text import slugify
 from django.db.models import Max
-# from django.views.generic.edit import FormMixin
+from django.contrib.postgres.search import SearchVector
 from django.views.generic import (ListView, DetailView, View, 
     FormView, RedirectView, CreateView)
 
@@ -24,6 +24,24 @@ class IndexView(ListView):
         return self.model.objects.filter(is_active=True).order_by('-date_added')\
             .annotate(current_bid=Max('bid__bid'))
 
+
+class SearchView(IndexView):
+    template_name = 'auctions/listing_search.html'
+    context_object_name = 'listing_search'
+
+    def get_queryset(self):
+        search_request = self.request.GET.get('q')
+        if search_request:
+            # query = self.model.objects.annotate(
+            #     similarity=TrigramWordSimilarity(search_request,
+            #     'name')
+            # ).filter(similarity__gt=0.3).order_by('-similarity')
+            query = self.model.objects.annotate(search=SearchVector('name', 'description', 'user__username')
+            ).filter(search=search_request)
+        else:
+            query = None
+        return query
+    
 
 class GetCategories(ListView):
     model = Category
