@@ -208,6 +208,32 @@ body {
     }
 }
 
+.filtering-panel {
+    margin-bottom: 25px;
+    /* padding: 0 25px; */
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid #dfe6ff;
+    align-items: center;
+    justify-content: right;
+}
+.radio {
+    /* position: relative; */
+    display: flex;
+    /* float: initial; */
+}
+.rad-form {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.rad-point {
+    width: auto;
+}
+.rad-label {
+    margin: 0 15px 0 5px;
+}
+
 .pagination {
     margin-bottom: 5%;
     display: flex;
