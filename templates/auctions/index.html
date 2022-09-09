@@ -12,30 +12,27 @@
         {% comment %} <h4>Sort:</h4> {% endcomment %}
 
         <div class="radio">
-            <form class="rad-form" action="#" method="GET">
-                <input class="rad-point" type="radio" id="all" name="bid_filter" value="" checked="checked">
+            <label class="form-label" for="sort">Sort by:</label>
+            <form id="sort" class="rad-form" action="{% url 'auctions:index' %}" method="GET">
+                <input class="rad-point" type="radio" id="all" name="bid_filter" value="all" checked="checked">
                 <label class="rad-label" for="all">Show all</label>
-                <input class="rad-point" type="radio" id="no-bids" name="bid_filter" value='no bids'>
+                <input class="rad-point" type="radio" id="no-bids" name="bid_filter" value='no_bids'>
                 <label class="rad-label" for="no-bids">Without bids</label>
                 <input class="rad-point" type="radio" id="bids" name="bid_filter" value="bids">
                 <label class="rad-label" for="bids">With bids</label>
 
+                {% comment %} <label for="slct-sort">order by:</label> {% endcomment %}
                 <select class="select-ordering" name="lst_sort" id="slct-sort">
-                    <label for="slct-sort">order by:</label>
-                    <option value="name">Date Asc</option>
-                    <option value="name">Date Desc</option>
+                    <option value="date_desc">Date Desc</option>
+                    <option value="date_asc">Date Asc</option>
                     <option value="name">Name</option>
                     <option value="bid_asc">Bid Asc</option>
-                    <option value="bid_asc">Bid Desc</option>
+                    <option value="bid_desc">Bid Desc</option>
                 </select>
 
-                <input type="submit" value="Sort">
+                <input class="sort-btn" type="submit" value="Sort">
             </form>
         </div>
-        
-    {% comment %} </div>
-
-    <div> {% endcomment %}
     </div>
 
     {% if active_listings %}
@@ -53,7 +50,7 @@
                         {{ listing.name }}
                     </div>
                     <div class="lst-bid">
-                        {% if listing.current_bid %}
+                        {% if listing.max_bid %}
                             <small>Current bid:</small> US ${{ listing.current_bid }}
                         {% else %}
                             <small>Starting bid:</small> US ${{ listing.start_bid }}

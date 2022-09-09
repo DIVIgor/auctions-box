@@ -4,9 +4,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils.text import slugify
+from django.db.models.functions import Greatest
+from django.db.models import F, Q
 from django.db.models import Max
 from django.contrib.postgres.search import SearchVector
-from django.views.generic import (ListView, DetailView, View, 
+from django.views.generic import (ListView, DetailView, View,
     FormView, RedirectView, CreateView)
 
 from .models import Category, Listing, Watchlist
@@ -21,13 +23,33 @@ class IndexView(ListView):
     context_object_name = 'active_listings'
 
     def get_queryset(self):
-        return self.model.objects.filter(is_active=True).order_by('-date_added')\
-            .annotate(current_bid=Max('bid__bid'))
+        # bid_filters = {'all': '', 'bids': '', 'no_bids': ''}
+        lst_orderings = {'date_desc': '-date_added', 'date_asc': 'date_added',
+            'name': 'name', 'bid_desc': '-current_bid', 'bid_asc': 'current_bid'}
+        bid_filter = self.request.GET.get('bid_filter')
+        lst_ordering = self.request.GET.get('lst_sort')
+
+        query = self.model.objects.filter(is_active=True).annotate(
+            max_bid=Max('bid__bid'), current_bid=Greatest('start_bid', 'max_bid'))
+        if bid_filter == 'all':
+            pass
+        elif bid_filter == 'no_bids':
+            query = query.filter(max_bid=None)
+        elif bid_filter == 'bids':
+            query = query.filter(Q(current_bid=F('max_bid')))
+        
+        if lst_ordering:
+            query = query.order_by(lst_orderings[lst_ordering])
+        # Listing.objects.annotate()
+        return query
+        # return .filter(fltr).order_by(
+        #         *ordr if type(ordr)==tuple else ordr)
 
 
 class SearchView(IndexView):
     template_name = 'auctions/listing_search.html'
     context_object_name = 'listing_search'
+    model = Listing
 
     def get_queryset(self):
         search_request = self.request.GET.get('q')
@@ -39,7 +61,7 @@ class SearchView(IndexView):
             query = self.model.objects.annotate(search=SearchVector('name', 'description', 'user__username')
             ).filter(search=search_request)
         else:
-            query = None
+            query = self.model.objects.all()
         return query
     
 
