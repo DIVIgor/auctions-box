@@ -8,26 +8,22 @@
     </div>
 
     <div class="filtering-panel">
-        {% comment %} <h3>Filters:</h3> {% endcomment %}
-        {% comment %} <h4>Sort:</h4> {% endcomment %}
-
         <div class="radio">
             <label class="form-label" for="sort">Sort by:</label>
             <form id="sort" class="rad-form" action="{% url 'auctions:index' %}" method="GET">
-                <input class="rad-point" type="radio" id="all" name="bid_filter" value="all" checked="checked">
+                <input class="rad-point" type="radio" id="all" name="bid_filter" value="all" {% if not request.GET.bid_filter or request.GET.bid_filter == "all" %}checked{% endif %}>
                 <label class="rad-label" for="all">Show all</label>
-                <input class="rad-point" type="radio" id="no-bids" name="bid_filter" value='no_bids'>
+                <input class="rad-point" type="radio" id="no-bids" name="bid_filter" value='no_bids'{% if request.GET.bid_filter == "no_bids" %}checked{% endif %}>
                 <label class="rad-label" for="no-bids">Without bids</label>
-                <input class="rad-point" type="radio" id="bids" name="bid_filter" value="bids">
+                <input class="rad-point" type="radio" id="bids" name="bid_filter" value="bids"{% if request.GET.bid_filter == "bids" %}checked{% endif %}>
                 <label class="rad-label" for="bids">With bids</label>
 
-                {% comment %} <label for="slct-sort">order by:</label> {% endcomment %}
                 <select class="select-ordering" name="lst_sort" id="slct-sort">
-                    <option value="date_desc">Date Desc</option>
-                    <option value="date_asc">Date Asc</option>
-                    <option value="name">Name</option>
-                    <option value="bid_asc">Bid Asc</option>
-                    <option value="bid_desc">Bid Desc</option>
+                    <option value="date_desc" {% if request.GET.lst_sort == "date_desc" %}selected{% endif %}>Date Desc</option>
+                    <option value="date_asc" {% if request.GET.lst_sort == "date_asc" %}selected{% endif %}>Date Asc</option>
+                    <option value="name" {% if request.GET.lst_sort == "name" %}selected{% endif %}>Name</option>
+                    <option value="bid_asc" {% if request.GET.lst_sort == "bid_asc" %}selected{% endif %}>Bid Asc</option>
+                    <option value="bid_desc" {% if request.GET.lst_sort == "bid_desc" %}selected{% endif %}>Bid Desc</option>
                 </select>
 
                 <input class="sort-btn" type="submit" value="Sort">
