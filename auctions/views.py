@@ -16,6 +16,29 @@ from account.models import User
 from .forms import ListingForm, BidForm, CommentForm
 
 
+lst_orderings = {
+    'date_desc': '-date_added', 'date_asc': 'date_added',
+    'name': 'name', 'bid_desc': '-current_bid',
+    'bid_asc': 'current_bid'
+}
+
+def filter_listings(self, query):
+    bid_filter = self.request.GET.get('bid_filter')
+    lst_ordering = self.request.GET.get('lst_sort')
+    
+    if bid_filter == 'all':
+        pass
+    elif bid_filter == 'no_bids':
+        query = query.filter(max_bid=None)
+    elif bid_filter == 'bids':
+        query = query.filter(Q(current_bid=F('max_bid')))
+    
+    if lst_ordering:
+        query = query.order_by(lst_orderings[lst_ordering])
+
+    return query
+
+
 class IndexView(ListView):
     paginate_by = 15
     model = Listing
@@ -23,45 +46,30 @@ class IndexView(ListView):
     context_object_name = 'active_listings'
 
     def get_queryset(self):
-        # bid_filters = {'all': '', 'bids': '', 'no_bids': ''}
-        lst_orderings = {'date_desc': '-date_added', 'date_asc': 'date_added',
-            'name': 'name', 'bid_desc': '-current_bid', 'bid_asc': 'current_bid'}
-        bid_filter = self.request.GET.get('bid_filter')
-        lst_ordering = self.request.GET.get('lst_sort')
-
         query = self.model.objects.filter(is_active=True).annotate(
-            max_bid=Max('bid__bid'), current_bid=Greatest('start_bid', 'max_bid'))
-        if bid_filter == 'all':
-            pass
-        elif bid_filter == 'no_bids':
-            query = query.filter(max_bid=None)
-        elif bid_filter == 'bids':
-            query = query.filter(Q(current_bid=F('max_bid')))
-        
-        if lst_ordering:
-            query = query.order_by(lst_orderings[lst_ordering])
-        # Listing.objects.annotate()
+            max_bid=Max('bid__bid'), current_bid=Greatest('start_bid', 'max_bid')
+        ).order_by('-date_added')
+        query = filter_listings(self, query)
+
         return query
-        # return .filter(fltr).order_by(
-        #         *ordr if type(ordr)==tuple else ordr)
 
 
 class SearchView(IndexView):
     template_name = 'auctions/listing_search.html'
     context_object_name = 'listing_search'
     model = Listing
+    ordering = '-date_added'
 
     def get_queryset(self):
         search_request = self.request.GET.get('q')
+        query = self.model.objects.annotate(max_bid=Max('bid__bid'),
+            current_bid=Greatest('start_bid', 'max_bid'),
+            search=SearchVector('name', 'description', 'user__username')
+        ).order_by('-date_added')
         if search_request:
-            # query = self.model.objects.annotate(
-            #     similarity=TrigramWordSimilarity(search_request,
-            #     'name')
-            # ).filter(similarity__gt=0.3).order_by('-similarity')
-            query = self.model.objects.annotate(search=SearchVector('name', 'description', 'user__username')
-            ).filter(search=search_request)
-        else:
-            query = self.model.objects.all()
+            query = query.filter(search=search_request)
+
+        query = filter_listings(self, query)
         return query
     
 
@@ -79,10 +87,17 @@ class GetListingsByCat(ListView):
     model = Listing
     template_name = 'auctions/listings_by_cat.html'
     context_object_name = 'listings'
+    ordering = '-date_added'
 
     def get_queryset(self):
-        return self.model.objects.filter(category__slug=self.kwargs['cat_slug'],\
-            is_active=True).order_by('-date_added').annotate(current_bid=Max('bid__bid'))
+        query = self.model.objects.filter(category__slug=self.kwargs['cat_slug'],
+            is_active=True).annotate(max_bid=Max('bid__bid'),
+                current_bid=Greatest('start_bid', 'max_bid'),
+                search=SearchVector('name', 'description', 'user__username')
+        ).order_by('-date_added')
+
+        query = filter_listings(self, query)
+        return query
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -98,8 +113,6 @@ class GetListing(DetailView, View):
     slug_url_kwarg = 'listing_slug'
     context_object_name = 'listing'
 
-    # def get_queryset(self):
-    #     return get_object_or_404(Listing, slug=self.kwargs['listing_slug'])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -160,27 +173,25 @@ class GetListing(DetailView, View):
 
 class GetUsersListings(ListView):
     paginate_by = 20
-    model = User
+    model = Listing
     template_name = 'auctions/users_listings.html'
     context_object_name = 'users_listings'
 
     def get_queryset(self):
-        return Listing.objects.filter(user=get_object_or_404(User, \
-            username=self.request.user)).order_by('-date_added')\
-            .annotate(current_bid=Max('bid__bid'))
+        query = self.model.objects.filter(user=get_object_or_404(
+            User, username=self.request.user)).order_by(
+                '-date_added').annotate(max_bid=Max('bid__bid'),
+                    current_bid=Greatest('start_bid', 'max_bid'),
+                    search=SearchVector('name', 'description', 'user__username'))
 
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['user'] = get_object_or_404(User, username=self.request.user)
-    #     context['users_listings'] = context['user'].listing_set.order_by('-date_added')
-    #     return context
+        query = filter_listings(self, query)
+        return query
 
 
 class GetBidding(ListView):
     paginate_by = 20
     model = User
     template_name = 'auctions/bidding.html'
-    # context_object_name = 'bids'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -214,10 +225,15 @@ class GetWatchlist(ListView):
     context_object_name = 'watchlist'
 
     def get_queryset(self):
-        return Listing.objects.filter(watchlist__user=get_object_or_404(User, username=self.request.user)).order_by('-date_added')\
-            .annotate(current_bid=Max('bid__bid'))
-        # return self.model.objects.filter(user=self.request.user).order_by('-date_added')\
-        #     .annotate(current_bid=Max('bid__bid'))
+        query = Listing.objects.filter(watchlist__user=get_object_or_404(User, username=self.request.user)
+            ).annotate(max_bid=Max('bid__bid'),
+                current_bid=Greatest('start_bid', 'max_bid'),
+                search=SearchVector('name', 'description', 'user__username')
+        ).order_by('-date_added')
+
+        query = filter_listings(self, query)
+
+        return query
 
 
 class AddToWatchlist(RedirectView):
