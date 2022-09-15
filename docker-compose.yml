@@ -16,7 +16,7 @@ services:
 
   web:
     container_name: cs-50_commerce
-    build: . -t cs-50-commerce:1.5
+    build: .
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code

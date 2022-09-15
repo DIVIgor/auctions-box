@@ -112,7 +112,8 @@ class BidViewSet(mixins.CreateModelMixin,
             raise PermissionDenied('Wrong bid value.')
 
 
-        # Raw query (An issue with results. pgAdmin returns the correct value while django on server and in shell - wrong)
+        # Raw query (An issue with results. pgAdmin returns the correct value
+        # while django on server and in shell - wrong)
         # current_bid = Bid.objects.raw(f"""
         #     SELECT id, (SELECT MAX(bids)
         #         FROM (VALUES (start_bid), (users_maxbid)) AS listing_bids(bids)) AS curr_bid

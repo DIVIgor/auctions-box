@@ -20,7 +20,7 @@ class ListingAdmin(admin.ModelAdmin):
     list_editable = ('is_active',)
     list_display_links = list_display[:4]
     list_filter = (
-        'category', 'name', 'user',
+        'category', 'user',
         'is_active', 'date_added', 'date_updated'
     )
     prepopulated_fields = {'slug': ('name',)}
