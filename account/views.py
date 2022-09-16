@@ -63,32 +63,43 @@ def register(request):
 
 
 class UserView(DetailView):
+    """Render detailed user info."""
+
     model = User
     template_name = 'account/user_details.html'
     context_object_name = 'user_details'
     queryset = model.objects.all()
 
     def get_object(self, queryset=queryset):
+        """Return an authenticated user."""
+
         return self.request.user
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        """Return context data."""
 
+        context = super().get_context_data(**kwargs)
         return context
 
 class ChangePassView(PasswordChangeView):
+    """Change the account password."""
+
     template_name = "account/change_password.html"
 
 class ChangePassDoneView(PasswordChangeDoneView):
+    """Render a success page if a password has successfully changed."""
+
     template_name = "account/password_change_done.html"
 
 class ChangeInfoView(UpdateView):
+    """Change the account info."""
+
     model = User
     template_name = "account/change_info.html"
-    # queryset = User.objects.all()
     form_class = BasicUserChangeForm
     success_url = 'details'
 
-    def get_object(self):
-        return self.request.user
+    def get_object(self, queryset=None):
+        """Return the authenticated user."""
 
+        return self.request.user

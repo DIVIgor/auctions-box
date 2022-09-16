@@ -1,13 +1,15 @@
+from decimal import Decimal
+
 from django.db import models
 from django.urls import reverse
 from django.core.validators import MinValueValidator
-
-from decimal import Decimal
 
 from account.models import User
 
 
 class Category(models.Model):
+    """A category model."""
+
     name = models.CharField(max_length=80)
     slug = models.SlugField(max_length=80, unique=True)
 
@@ -22,6 +24,8 @@ class Category(models.Model):
         return reverse('auctions:listings', args=[self.slug])
 
 class Listing(models.Model):
+    """A listing model."""
+
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=250)
@@ -43,6 +47,8 @@ class Listing(models.Model):
         })
 
 class Bid(models.Model):
+    """A bid model."""
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
     bid = models.DecimalField(max_digits=19, decimal_places=2)
@@ -50,14 +56,18 @@ class Bid(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
 
 class Comment(models.Model):
+    """A comment model."""
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
     text = models.TextField(max_length=3000)
     date_added = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
-    # is_active = models.BooleanField(default=True)
+    # is_active = models.BooleanField(default=False)
 
 class Watchlist(models.Model):
+    """A watchlist model."""
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
     date_added = models.DateTimeField(auto_now_add=True)

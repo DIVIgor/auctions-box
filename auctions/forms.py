@@ -5,6 +5,11 @@ from .models import Listing, Bid, Comment
 
 
 class ListingForm(forms.ModelForm):
+    """A listing form.
+    Contains fields: `category`, `name`, `image`, `start_bid`,
+    and `description`.
+    """
+
     class Meta:
         model = Listing
         fields = [
@@ -17,9 +22,12 @@ class ListingForm(forms.ModelForm):
             'description': 'Description', 'start_bid': 'Start bid',
             'image': 'Image URL'
         }
-        field_order = ['name', ]
 
 class BidForm(forms.ModelForm):
+    """A bid form.
+    Contains fields: `bid`, `listing`.
+    """
+
     class Meta:
         model = Bid
         fields = ('bid', 'listing')
@@ -27,6 +35,8 @@ class BidForm(forms.ModelForm):
         widgets = {'listing': forms.HiddenInput()}
 
     def clean(self):
+        """Validate a new bid."""
+
         new_bid = self.cleaned_data.get('bid')
         listing = self.cleaned_data.get('listing')
         start_bid = listing.start_bid
@@ -44,6 +54,10 @@ class BidForm(forms.ModelForm):
         return self.cleaned_data
 
 class CommentForm(forms.ModelForm):
+    """A comment form.
+    Contains field `text`.
+    """
+
     class Meta:
         model = Comment
         fields = ('text',)

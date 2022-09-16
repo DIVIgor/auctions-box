@@ -61,3 +61,5 @@ API features:
 - Change the max page size
 
 ## Illustrations
+- Admin-panel demo
+![Admin-panel demo](https://user-images.githubusercontent.com/44866199/190412901-a6578c1d-ed08-4381-8b77-cb36f1510d38.gif)
