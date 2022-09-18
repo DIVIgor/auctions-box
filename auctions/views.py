@@ -4,9 +4,6 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils.text import slugify
-from django.db.models.functions import Greatest
-from django.db.models import F, Q
-from django.db.models import Max
 from django.contrib.postgres.search import SearchVector
 from django.views.generic import (ListView, DetailView, View,
     FormView, RedirectView)
@@ -14,34 +11,10 @@ from django.views.generic import (ListView, DetailView, View,
 from account.models import User
 from .models import Category, Listing, Watchlist
 from .forms import ListingForm, BidForm, CommentForm
+from .mixins import GetListingsQuerySetMixin
 
 
-LST_ORDERINGS = {
-    'date_desc': '-date_added', 'date_asc': 'date_added',
-    'name': 'name', 'bid_desc': '-current_bid',
-    'bid_asc': 'current_bid'
-}
-
-def filter_listings(self, query):
-    """A function that filters and orders a query by request."""
-
-    bid_filter = self.request.GET.get('bid_filter')
-    lst_ordering = self.request.GET.get('lst_sort')
-
-    if bid_filter == 'all':
-        pass
-    elif bid_filter == 'no_bids':
-        query = query.filter(max_bid=None)
-    elif bid_filter == 'bids':
-        query = query.filter(Q(current_bid=F('max_bid')))
-
-    if lst_ordering:
-        query = query.order_by(LST_ORDERINGS[lst_ordering])
-
-    return query
-
-
-class IndexView(ListView):
+class IndexView(GetListingsQuerySetMixin, ListView):
     """Render the homepage, set by a number of listings per page and
     template name.
     """
@@ -52,19 +25,15 @@ class IndexView(ListView):
     context_object_name = 'active_listings'
 
     def get_queryset(self):
-        """Return a set of listings with extra data: `max_bid` and
-        `current_bid`. Ordering by date added descending by default.
+        """Call a `get_listingset` function to get a query of listings.
+        Return the query filtered by `is_active=True`.
         """
 
-        query = self.model.objects.filter(is_active=True).annotate(
-            max_bid=Max('bid__bid'), current_bid=Greatest('start_bid', 'max_bid')
-        ).order_by('-date_added')
-        query = filter_listings(self, query)
-
-        return query
+        return self.get_listingset().filter(is_active=True)
+        
 
 
-class SearchView(IndexView):
+class SearchView(GetListingsQuerySetMixin, ListView):
     """Render page that depends on user's request."""
 
     template_name = 'auctions/listing_search.html'
@@ -72,20 +41,15 @@ class SearchView(IndexView):
     model = Listing
 
     def get_queryset(self):
-        """Return a query annotated by `current_bid` - starting bid or
-        user's one, `max_bid` - the max set bid or none, and `search`
-        - fields to look in. If set, filter the query by a search request.
+        """Call a `get_listingset` function to get a query of listings.
+        Filter the query by a search request.
         """
 
         search_request = self.request.GET.get('q')
-        query = self.model.objects.annotate(max_bid=Max('bid__bid'),
-            current_bid=Greatest('start_bid', 'max_bid'),
-            search=SearchVector('name', 'description', 'user__username')
-        ).order_by('-date_added')
+        query = self.get_listingset().annotate(search=SearchVector('name', 'description', 'user__username'))
         if search_request:
             query = query.filter(search=search_request)
 
-        query = filter_listings(self, query)
         return query
 
 
@@ -102,7 +66,7 @@ class GetCategories(ListView):
         return self.model.objects.all()
 
 
-class GetListingsByCat(ListView):
+class GetListingsByCat(GetListingsQuerySetMixin, ListView):
     """Render listings by chosen category."""
 
     paginate_by = 15
@@ -111,17 +75,11 @@ class GetListingsByCat(ListView):
     context_object_name = 'listings'
 
     def get_queryset(self):
-        """Return a set of listings by category with extra data: `max_bid` and
-        `current_bid`. Ordering by date added descending by default.
+        """Call a `get_listingset` function to get a query of listings.
+        Return the query filtered by `is_active=True` and `cat_slug`.
         """
-        query = self.model.objects.filter(category__slug=self.kwargs['cat_slug'],
-            is_active=True).annotate(max_bid=Max('bid__bid'),
-                current_bid=Greatest('start_bid', 'max_bid'),
-                search=SearchVector('name', 'description', 'user__username')
-        ).order_by('-date_added')
 
-        query = filter_listings(self, query)
-        return query
+        return self.get_listingset().filter(is_active=True, category__slug=self.kwargs['cat_slug'])
 
     def get_context_data(self, **kwargs):
         """Return context by category."""
@@ -210,7 +168,7 @@ class GetListing(DetailView, View):
         return self.render_to_response(self.get_context_data(**context))
 
 
-class GetUsersListings(ListView):
+class GetUsersListings(GetListingsQuerySetMixin, ListView):
     """Render listings created by a user."""
 
     paginate_by = 20
@@ -219,15 +177,13 @@ class GetUsersListings(ListView):
     context_object_name = 'users_listings'
 
     def get_queryset(self):
-        """Return queryset of listings created by a user."""
+        """Call a `get_listingset` function to get a query of listings.
+        Return the query filtered by `user` (owner).
+        """
 
-        query = self.model.objects.filter(user=get_object_or_404(
-            User, username=self.request.user)).order_by(
-                '-date_added').annotate(max_bid=Max('bid__bid'),
-                    current_bid=Greatest('start_bid', 'max_bid'),
-                    search=SearchVector('name', 'description', 'user__username'))
+        query = self.get_listingset().filter(user=get_object_or_404(
+            User, username=self.request.user))
 
-        query = filter_listings(self, query)
         return query
 
 
@@ -273,7 +229,7 @@ class AddListing(FormView):
         return redirect(listing.get_absolute_url())
 
 
-class GetWatchlist(ListView):
+class GetWatchlist(GetListingsQuerySetMixin, ListView):
     """Render user's watchlist watchlist."""
 
     paginate_by = 20
@@ -282,15 +238,13 @@ class GetWatchlist(ListView):
     context_object_name = 'watchlist'
 
     def get_queryset(self):
-        """Return query of listings watched by a user."""
+        """Call a `get_listingset` function to get a query of listings.
+        Return query of listings watched by a user.
+        """
 
-        query = Listing.objects.filter(watchlist__user=get_object_or_404(User,
-            username=self.request.user)).annotate(max_bid=Max('bid__bid'),
-                current_bid=Greatest('start_bid', 'max_bid'),
-                search=SearchVector('name', 'description', 'user__username')
-        ).order_by('-date_added')
-
-        query = filter_listings(self, query)
+        query = self.get_listingset().filter(
+            watchlist__user=get_object_or_404(User, username=self.request.user
+            ))
 
         return query
 
