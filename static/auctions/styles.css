@@ -268,7 +268,6 @@ input[type="number"] {
     padding: 0 10px;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 15px;
-    font-weight: bold;
 }
 #gla-btn:hover,
 #make-bid:hover,
@@ -471,11 +470,18 @@ summary:hover {
     }
     .lg-seller > span {
         margin: 15px;
+        font-size: 17px;
     }
     .lg-descr > h3 {
         font-size: 25px;
     }
     .cur-bid > div {
+        font-size: 20px;
+    }
+    #id-bid-form > input,
+    .comment-form > textarea,
+    #gla-btn, #make-bid,
+    #comment {
         font-size: 20px;
     }
 }
@@ -516,7 +522,6 @@ summary:hover {
 button {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 15px;
-    font-weight: bold;
 }
 .logo {
     font-size: 25px;
