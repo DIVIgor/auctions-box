@@ -48,8 +48,10 @@
                 {% endif %}
                 {% if not listing.is_active and user == current_bid_owner %}
                     <h3>Your bid won!</h3>
-                {% elif not listing.is_active and user != current_bid_owner %}
+                {% elif not listing.is_active and max_bid and user != current_bid_owner %}
                     <h3>Winner: {{ current_bid_owner }}</h3>
+                {% elif not listing.is_active and not max_bid %}
+                    <h3>Closed without arriving bids.</h3>
                 {% endif %}
             </div>
 

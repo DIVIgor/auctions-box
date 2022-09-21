@@ -14,23 +14,17 @@ from .forms import ListingForm, BidForm, CommentForm
 from .mixins import GetListingsQuerySetMixin
 
 
-class IndexView(GetListingsQuerySetMixin, ListView):
-    """Render the homepage, set by a number of listings per page and
-    template name.
-    """
+class CategoryView(ListView):
+    """Render a list of categories."""
 
-    paginate_by = 15
-    model = Listing
-    template_name = 'auctions/index.html'
-    context_object_name = 'active_listings'
+    model = Category
+    template_name = 'auctions/categories.html'
+    context_object_name = 'categories'
 
     def get_queryset(self):
-        """Call a `get_listingset` function to get a query of listings.
-        Return the query filtered by `is_active=True`.
-        """
+        """Return a queryset of categories."""
 
-        return self.get_listingset().filter(is_active=True)
-        
+        return self.model.objects.all()
 
 
 class SearchView(GetListingsQuerySetMixin, ListView):
@@ -53,20 +47,25 @@ class SearchView(GetListingsQuerySetMixin, ListView):
         return query
 
 
-class GetCategories(ListView):
-    """Render a list of categories."""
+class IndexView(GetListingsQuerySetMixin, ListView):
+    """Render the homepage, set by a number of listings per page and
+    template name.
+    """
 
-    model = Category
-    template_name = 'auctions/categories.html'
-    context_object_name = 'categories'
+    paginate_by = 15
+    model = Listing
+    template_name = 'auctions/index.html'
+    context_object_name = 'active_listings'
 
     def get_queryset(self):
-        """Return a queryset of categories."""
+        """Call a `get_listingset` function to get a query of listings.
+        Return the query filtered by `is_active=True`.
+        """
 
-        return self.model.objects.all()
+        return self.get_listingset().filter(is_active=True)    
 
 
-class GetListingsByCat(GetListingsQuerySetMixin, ListView):
+class ListingsByCatView(GetListingsQuerySetMixin, ListView):
     """Render listings by chosen category."""
 
     paginate_by = 15
@@ -88,12 +87,67 @@ class GetListingsByCat(GetListingsQuerySetMixin, ListView):
         return context
 
 
-class GetListing(DetailView, View):
-    """Render a detailed listing page with a bid and a comment forms."""
+class ListingsByOwnerView(GetListingsQuerySetMixin, ListView):
+    """Render listings created by a user."""
+
+    paginate_by = 20
+    model = Listing
+    template_name = 'auctions/users_listings.html'
+    context_object_name = 'users_listings'
+
+    def get_queryset(self):
+        """Call a `get_listingset` function to get a query of listings.
+        Return the query filtered by `user` (owner).
+        """
+
+        query = self.get_listingset().filter(user=get_object_or_404(
+            User, username=self.request.user))
+
+        return query
+
+
+class GetFilledForm(View):
+    """Check which form has been filled. Depends on `DetailedListingView`"""
 
     model = Listing
     bid_form_class = BidForm
     comment_form_class = CommentForm
+
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        """Check `POST` request for type of submit. Depends on request
+        build a filled form for bid or comment. Redirect to the listing page if
+        form is valid. Otherwise append invalid data to context and rerender
+        the page.
+        """
+
+        self.object = self.get_object()
+        context = {}
+        post_data = copy(self.request.POST)
+        post_data['listing'] = self.object
+
+        if 'bid_submit' in request.POST:
+            form = self.bid_form_class(post_data)
+        elif 'comment_submit' in request.POST:
+            form = self.comment_form_class(post_data)
+
+        if form.is_valid():
+            form_data = form.save(commit=False)
+            form_data.user = self.request.user
+            form_data.listing = self.object
+            form_data.save()
+            return redirect(self.object.get_absolute_url())
+        elif isinstance(form, BidForm) and not form.is_valid():
+            context['bid_form'] = form
+        elif isinstance(form, CommentForm) and not form.is_valid():
+            context['comment_form'] = form
+        return self.render_to_response(self.get_context_data(**context))
+
+
+class DetailedListingView(GetFilledForm, DetailView):
+    """Render a detailed listing page with a bid and a comment forms."""
+
+    model = Listing
     template_name = 'auctions/listing.html'
     slug_url_kwarg = 'listing_slug'
     context_object_name = 'listing'
@@ -137,73 +191,8 @@ class GetListing(DetailView, View):
 
         return context
 
-    @method_decorator(login_required)
-    def post(self, request, *args, **kwargs):
-        """Check `POST` request for type of submit. Depends on request
-        build a filled form for bid or comment. Redirect to the listing page if
-        form is valid. Otherwise append invalid data to context and rerender
-        the page.
-        """
 
-        self.object = self.get_object()
-        context = {}
-        post_data = copy(self.request.POST)
-        post_data['listing'] = self.object
-
-        if 'bid_submit' in request.POST:
-            form = self.bid_form_class(post_data)
-        elif 'comment_submit' in request.POST:
-            form = self.comment_form_class(post_data)
-
-        if form.is_valid():
-            form_data = form.save(commit=False)
-            form_data.user = self.request.user
-            form_data.listing = self.object
-            form_data.save()
-            return redirect(self.object.get_absolute_url())
-        elif isinstance(form, BidForm) and not form.is_valid():
-            context['bid_form'] = form
-        elif isinstance(form, CommentForm) and not form.is_valid():
-            context['comment_form'] = form
-        return self.render_to_response(self.get_context_data(**context))
-
-
-class GetUsersListings(GetListingsQuerySetMixin, ListView):
-    """Render listings created by a user."""
-
-    paginate_by = 20
-    model = Listing
-    template_name = 'auctions/users_listings.html'
-    context_object_name = 'users_listings'
-
-    def get_queryset(self):
-        """Call a `get_listingset` function to get a query of listings.
-        Return the query filtered by `user` (owner).
-        """
-
-        query = self.get_listingset().filter(user=get_object_or_404(
-            User, username=self.request.user))
-
-        return query
-
-
-class GetBidding(ListView):
-    """Render list of bids made by a user."""
-
-    paginate_by = 20
-    model = User
-    template_name = 'auctions/bidding.html'
-
-    def get_context_data(self, **kwargs):
-        """Return context by user."""
-
-        context = super().get_context_data(**kwargs)
-        context['user'] = get_object_or_404(User, username=self.request.user)
-        context['bids'] = context['user'].bid_set.order_by('-date_added')
-        return context
-
-
-class AddListing(FormView):
+class AddListingView(FormView):
     """Render a page with a create listing form."""
 
     form_class = ListingForm
@@ -229,7 +218,51 @@ class AddListing(FormView):
         return redirect(listing.get_absolute_url())
 
 
-class GetWatchlist(GetListingsQuerySetMixin, ListView):
+class CloseListingView(RedirectView):
+    """Close a listing."""
+
+    permanent = False
+    query_string = True
+    pattern_name = 'close_listing'
+
+    def deactivate_listing(self, listing):
+        """Set `is_active` parameter to `False` for the listing. Return
+        the listing.
+        """
+
+        if listing.user == self.request.user:
+            listing.is_active = False
+            listing.save()
+        return listing
+
+    def get_redirect_url(self, *args, **kwargs):
+        """Get a listing by a slug. Call `deactivate_liting` function.
+        Redirect to a listing page.
+        """
+
+        listing = get_object_or_404(Listing, slug=kwargs['listing_slug'])
+        listing = self.deactivate_listing(listing)
+
+        return listing.get_absolute_url()
+
+
+class BiddingView(ListView):
+    """Render list of bids made by a user."""
+
+    paginate_by = 20
+    model = User
+    template_name = 'auctions/bidding.html'
+
+    def get_context_data(self, **kwargs):
+        """Return context by user."""
+
+        context = super().get_context_data(**kwargs)
+        context['user'] = get_object_or_404(User, username=self.request.user)
+        context['bids'] = context['user'].bid_set.order_by('-date_added')
+        return context
+
+
+class WatchlistView(GetListingsQuerySetMixin, ListView):
     """Render user's watchlist watchlist."""
 
     paginate_by = 20
@@ -273,33 +306,5 @@ class AddToWatchlist(RedirectView):
 
         listing = get_object_or_404(Listing, slug=kwargs['listing_slug'])
         self.watch_or_unwatch(listing)
-
-        return listing.get_absolute_url()
-
-
-class CloseListing(RedirectView):
-    """Close a listing."""
-
-    permanent = False
-    query_string = True
-    pattern_name = 'close_listing'
-
-    def deactivate_listing(self, listing):
-        """Set `is_active` parameter to `False` for the listing. Return
-        the listing.
-        """
-
-        if listing.user == self.request.user:
-            listing.is_active = False
-            listing.save()
-        return listing
-
-    def get_redirect_url(self, *args, **kwargs):
-        """Get a listing by a slug. Call `deactivate_liting` function.
-        Redirect to a listing page.
-        """
-
-        listing = get_object_or_404(Listing, slug=kwargs['listing_slug'])
-        listing = self.deactivate_listing(listing)
 
         return listing.get_absolute_url()
