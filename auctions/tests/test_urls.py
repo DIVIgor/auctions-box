@@ -1,13 +1,13 @@
 from django.test import SimpleTestCase
 from django.urls import reverse, resolve
 
-from auctions.views import (IndexView, CategoryView, ListingsByCatView,
-    DetailedListingView, ListingsByOwnerView, BiddingView, AddListingView,
-    AddToWatchlist, WatchlistView, CloseListingView, SearchView)
+from auctions.views import (SearchView, IndexView, CategoryView,
+    ListingsByCatView, DetailedListingView, AddListingView, WatchlistView,
+    AddToWatchlist, CloseListingView, ListingsByOwnerView, BiddingView)
 
 
 class TestUrls(SimpleTestCase):
-    """Test case for auctions urls"""
+    """A test case for auctions urls."""
 
     def test_search_listing_url(self):
         url = reverse('auctions:search_listing')
