@@ -185,7 +185,7 @@ class DetailedListingView(GetFilledForm, DetailView):
             if bids:
                 is_last_bidder =  bids[0] == self.request.user
 
-            if not is_author and not is_last_bidder and self.object.is_active:
+            if not is_author and not is_last_bidder and self.object.is_active and not context.get('bid_form'):
                 bid_form = self.bid_form_class()
                 context['bid_form'] = bid_form
 

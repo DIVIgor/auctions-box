@@ -39,6 +39,15 @@
                             {% csrf_token %}
                             {{ bid_form.bid }}
                             <button id="make-bid" type="submit" name="bid_submit" value="bid">Bid</button>
+                            {% if bid_form.bid.errors %}
+                                <div class="errors">
+                                    <ul class="field-errors-ul">
+                                        {% for error in bid_form.bid.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
                         </form>
                     {% endif %}
                 {% elif user == current_bid_owner and listing.is_active %}
