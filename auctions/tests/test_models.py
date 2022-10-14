@@ -158,7 +158,7 @@ class BidModelTest(TestCase):
         Category.objects.create(name='Test Category')
 
         Listing.objects.create(
-            category = Category.objects.get(id=1),
+            category = Category.objects.get(name='Test Category'),
             user = User.objects.get(username='Owner'),
             name = 'Test Listing',
             start_bid = 10.95
@@ -166,7 +166,7 @@ class BidModelTest(TestCase):
 
         Bid.objects.create(
             user = User.objects.get(username='Tester'),
-            listing = Listing.objects.get(id=1),
+            listing = Listing.objects.get(name='Test Listing'),
             bid = 11.5
         )
 

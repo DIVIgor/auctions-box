@@ -13,11 +13,11 @@ class ListingForm(forms.ModelForm):
 
     class Meta:
         model = Listing
-        fields = [
+        fields = (
             'category', 'name',
             'image', 'start_bid',
             'description'
-        ]
+        )
         labels = {
             'name': 'Listing name', 'category': 'Category',
             'description': 'Description', 'start_bid': 'Start bid',
