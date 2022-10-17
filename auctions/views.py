@@ -30,6 +30,7 @@ class CategoryView(ListView):
 class SearchView(GetListingsQuerySetMixin, ListView):
     """Render page that depends on user's request."""
 
+    paginate_by = 15
     template_name = 'auctions/listing_search.html'
     context_object_name = 'listing_search'
     model = Listing
@@ -40,7 +41,8 @@ class SearchView(GetListingsQuerySetMixin, ListView):
         """
 
         search_request = self.request.GET.get('q')
-        query = self.get_listingset().annotate(search=SearchVector('name', 'description', 'user__username'))
+        query = self.get_listingset().annotate(search=SearchVector(
+            'name', 'description', 'user__username'))
         if search_request:
             query = query.filter(search=search_request)
 
@@ -62,7 +64,7 @@ class IndexView(GetListingsQuerySetMixin, ListView):
         Return the query filtered by `is_active=True`.
         """
 
-        return self.get_listingset().filter(is_active=True)    
+        return self.get_listingset().filter(is_active=True)
 
 
 class ListingsByCatView(GetListingsQuerySetMixin, ListView):

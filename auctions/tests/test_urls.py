@@ -1,7 +1,7 @@
 from django.test import SimpleTestCase
 from django.urls import reverse, resolve
 
-from auctions.views import (SearchView, IndexView, CategoryView,
+from ..views import (SearchView, IndexView, CategoryView,
     ListingsByCatView, DetailedListingView, AddListingView, WatchlistView,
     AddToWatchlist, CloseListingView, ListingsByOwnerView, BiddingView)
 

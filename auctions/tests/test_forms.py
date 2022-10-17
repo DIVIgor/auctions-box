@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django import forms
 
-from ..forms import ListingForm, BidForm, CommentForm
-from ..models import Listing, Category
 from account.models import User
+from ..models import Listing, Category
+from ..forms import ListingForm, BidForm, CommentForm
 
 
 class ListingFormTest(TestCase):
