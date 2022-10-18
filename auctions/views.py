@@ -84,6 +84,7 @@ class ListingsByCatView(GetListingsQuerySetMixin, ListView):
 
     def get_context_data(self, **kwargs):
         """Return context by category."""
+
         context = super().get_context_data(**kwargs)
         context['category'] = get_object_or_404(Category, slug=self.kwargs['cat_slug'])
         return context
