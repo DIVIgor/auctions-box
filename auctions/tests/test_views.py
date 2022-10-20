@@ -1,5 +1,5 @@
 from unittest import skip
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.urls import reverse, resolve
 
 from account.models import User
@@ -22,7 +22,6 @@ class BaseTestViewMethodsMixin:
 
     def test_view_url_exists_at_desired_location(self):
         resp = self.client.get(self.location)
-        print(resp.request)
         self.assertEqual(resp.status_code, 200)
 
     def test_view_uses_correct_template(self):
@@ -39,7 +38,8 @@ class ListingTestViewMethodsMixin:
 
     def test_pagination_is_correct(self):
         self.assertTrue(self.resp.context['is_paginated'])
-        self.assertEqual(len(self.resp.context[self.context_name]), self.paginated_by)
+        self.assertEqual(len(
+            self.resp.context[self.context_name]), self.paginated_by)
 
 class TestCategoryView(BaseTestViewMethodsMixin, TestCase):
     """A test case for Category View."""
@@ -48,8 +48,8 @@ class TestCategoryView(BaseTestViewMethodsMixin, TestCase):
     def setUpTestData(cls):
         category_num = 10
         for category in range(category_num):
-            Category.objects.create(name=f'Cat {category}',
-                slug=f'cat-{category}')
+            Category.objects.create(
+                name=f'Cat {category}', slug=f'cat-{category}')
 
     def setUp(self):
         self.location = '/categories/'
@@ -77,8 +77,7 @@ class TestSearchView(
                 name = f'Listing {listing}',
                 slug = f'listing-{listing}',
                 description = f'A description for test {listing}.',
-                start_bid = listing
-            )
+                start_bid = listing)
 
     def setUp(self):
         self.paginated_by = 15
@@ -117,8 +116,7 @@ class TestIndexView(
                 slug = f'listing-{listing}',
                 description = f'A description for test {listing}.',
                 start_bid = listing,
-                is_active = listing % 2
-            )
+                is_active = listing % 2)
 
     def setUp(self):
         self.paginated_by = 15
@@ -146,13 +144,12 @@ class TestListingsByCatView(
                 slug = f'listing-{listing}',
                 description = f'A description for test {listing}.',
                 start_bid = listing,
-                is_active = listing % 2
-            )
+                is_active = listing % 2)
 
     def setUp(self):
         self.paginated_by = 15
         self.cat_slug = 'cat-1'
-        self.location = '/cat-1/'
+        self.location = f'/{self.cat_slug}/'
         self.context_name = 'listings'
         self.template_name = 'auctions/listings_by_cat.html'
         self.resp = self.client.get(reverse('auctions:listings', args=[self.cat_slug]))
@@ -168,21 +165,19 @@ class TestListingsByOwnerView(
     @classmethod
     def setUpTestData(cls):
         listing_num = 25
-        Category.objects.create(name='Cat', slug='cat')
-        User.objects.create_user(username='Tester')
+        cls.category = Category.objects.create(name='Cat', slug='cat')
+        cls.user = User.objects.create_user(username='Tester')
 
         for listing in range(listing_num):
             Listing.objects.create(
-                category = Category.objects.get(name='Cat'),
-                user = User.objects.get(username='Tester'),
+                category = cls.category, #Category.objects.get(name='Cat'),
+                user = cls.user, #User.objects.get(username='Tester'),
                 name = f'Listing {listing}',
                 slug = f'listing-{listing}',
                 description = f'A description for test {listing}.',
-                start_bid = listing
-            )
+                start_bid = listing)
 
     def setUp(self):
-        self.user = User.objects.get(username='Tester')
         self.paginated_by = 20
         self.location = '/my-listings/'
         self.context_name = 'users_listings'
@@ -198,3 +193,59 @@ class TestListingsByOwnerView(
     def test_view_lists_only_listings_by_desired_user(self):
         for listing in self.resp.context[self.context_name]:
             self.assertEqual(listing.user, self.user)
+
+class TestDetailedListingView(BaseTestViewMethodsMixin, TestCase):
+    """A test case for Detailed Listing View."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user_owner = User.objects.create_user(username='user_owner')
+        cls.user_customer = User.objects.create_user(username='user_customer')
+        cls.category = Category.objects.create(name='Cat', slug='cat')
+        cls.listing = Listing.objects.create(
+            category = cls.category, #Category.objects.get(name='Cat'),
+            user = cls.user_owner,
+            name = 'Listing',
+            slug = 'listing',
+            description = 'A description for test listing.',
+            start_bid = 10.95)
+        cls.bid = Bid.objects.create(
+            user=cls.user_customer, listing=cls.listing, bid=19.99)
+
+    def setUp(self):
+        self.paginated_by = 20
+        self.location = f'/{self.category.slug}/{self.listing.slug}/'
+        self.context_name = 'listing'
+        self.template_name = 'auctions/listing.html'
+        self.resp = self.client.get(reverse(
+            'auctions:listing',
+            args=[self.category.slug, self.listing.slug]))
+
+        self.basic_context_checklist = [
+            'start_bid', 'listing_owner', 'comments'
+        ]
+        self.bid_context_checklist = [
+            'current_bid', 'current_bid_owner', 'bid_count'
+        ]
+        self.authenticated_as_customer_checklist = [
+            'in_watchlist', 'bid_form', 'comment_form'
+        ]
+
+    def test_view_context_lists_basic_info(self):
+        for context in self.basic_context_checklist:
+            self.assertIn(context, self.resp.context)
+
+    def test_bidded_listing_context_lists_bid_info(self):
+        for context in self.bid_context_checklist:
+            self.assertIn(context, self.resp.context)
+
+    # def test_context_for_users_authenticated_as_customer(self):
+    #     request_factory = RequestFactory().get(reverse(
+    #         'auctions:listing',
+    #         args=[self.category.slug, self.listing.slug]))
+    #     self.client.force_login(self.user_customer)
+    #     request_factory.user = self.user_customer
+    #     # self.resp.request['user'] = self.user_customer
+    #     print(self.resp.request)
+    #     for context in self.authenticated_as_customer_checklist:
+    #         self.assertIn(context, self.resp.context)
