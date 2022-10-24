@@ -6,34 +6,35 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
+from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic import DetailView, FormView, UpdateView
 
 from .models import User
 from .forms import BasicUserChangeForm
 
 
-def login_view(request):
-    if request.method == "POST":
+# def login_view(request):
+#     if request.method == "POST":
 
-        # Attempt to sign user in
-        username = request.POST["username"]
-        password = request.POST["password"]
-        user = authenticate(request, username=username, password=password)
+#         # Attempt to sign user in
+#         username = request.POST["username"]
+#         password = request.POST["password"]
+#         user = authenticate(request, username=username, password=password)
 
-        # Check if authentication successful
-        if user is not None:
-            login(request, user)
-            return HttpResponseRedirect(reverse("auctions:index"))
-        else:
-            return render(request, "account/login.html", {
-                "message": "Invalid username and/or password."
-            })
-    else:
-        return render(request, "account/login.html")
+#         # Check if authentication successful
+#         if user is not None:
+#             login(request, user)
+#             return HttpResponseRedirect(reverse("auctions:index"))
+#         else:
+#             return render(request, "account/login.html", {
+#                 "message": "Invalid username and/or password."
+#             })
+#     else:
+#         return render(request, "account/login.html")
 
-def logout_view(request):
-    logout(request)
-    return HttpResponseRedirect(reverse("auctions:index"))
+# def logout_view(request):
+#     logout(request)
+#     return HttpResponseRedirect(reverse("auctions:index"))
 
 def register(request):
     if request.method == "POST":
@@ -61,6 +62,11 @@ def register(request):
     else:
         return render(request, "account/register.html")
 
+class LogInView(LoginView):
+    template_name = 'account/login.html'
+
+class LogOutView(LogoutView):
+    pass
 
 class UserView(DetailView):
     """Render detailed user info."""
