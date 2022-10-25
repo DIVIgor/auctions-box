@@ -239,13 +239,8 @@ class TestDetailedListingView(BaseTestViewMethodsMixin, TestCase):
         for context in self.bid_context_checklist:
             self.assertIn(context, self.resp.context)
 
-    # def test_context_for_users_authenticated_as_customer(self):
-    #     request_factory = RequestFactory().get(reverse(
-    #         'auctions:listing',
-    #         args=[self.category.slug, self.listing.slug]))
-    #     self.client.force_login(self.user_customer)
-    #     request_factory.user = self.user_customer
-    #     # self.resp.request['user'] = self.user_customer
-    #     print(self.resp.request)
-    #     for context in self.authenticated_as_customer_checklist:
-    #         self.assertIn(context, self.resp.context)
+    def test_context_for_user_authenticated_as_customer(self):
+        self.client.force_login(self.user_customer)
+        resp = self.client.get(self.location)
+        for context in self.authenticated_as_customer_checklist:
+            self.assertIn(context, resp.context)

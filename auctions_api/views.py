@@ -137,7 +137,7 @@ class WatchlistViewSet(mixins.CreateModelMixin,
         if self.get_queryset().filter(listing=serializer.validated_data['listing']):
             raise PermissionDenied('Already in watchlist.')
         serializer.save(user=self.request.user)
-    
+
 class BidViewSet(mixins.CreateModelMixin,
                  mixins.ListModelMixin,
                  viewsets.GenericViewSet):
@@ -201,7 +201,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         """Create a comment instance. The `user` field fills automatically."""
 
         serializer.save(user=self.request.user)
-    
+
     def perform_update(self, serializer):
         """Permission to update the instance for owner and staff only."""
 
