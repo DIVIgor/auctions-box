@@ -7,10 +7,12 @@
         <h1 class="page-title card-title">Register</h1>
         <div class="reg-log-form">
             <form action="{% url 'account:register' %}" method="post">
-                {% if message %}
+                {% if form.non_field_errors %}
+                    {% for error in form.non_field_errors %}
                     <div class="field-label errors">
-                        <div class="msg">{{ message|safe }}</div>
+                        <div class="msg">{{ error|safe }}</div>
                     </div>
+                    {% endfor %}
                 {% endif %}
                 {% csrf_token %}
                 <div class="form-group">
@@ -26,7 +28,7 @@
                             </ul>
                         </div>
                     {% endif %}
-                    <input class="form-control" type="text" name="username" placeholder="Username">
+                    <input class="form-control" type="text" name="username" placeholder="Username" value={% if form.username.value %}{{ form.username.value }}{% else %}{% endif %}>
                 </div>
                 <div class="form-group">
                     <div class="field-label">
@@ -41,7 +43,7 @@
                             </ul>
                         </div>
                     {% endif %}
-                    <input class="form-control" type="email" name="email" placeholder="Email Address">
+                    <input class="form-control" type="email" name="email" placeholder="Email Address" value={% if form.email.value %}{{ form.email.value }}{% else %}{% endif %}>
                 </div>
                 <div class="form-group">
                     <div class="field-label">
@@ -56,7 +58,7 @@
                             </ul>
                         </div>
                     {% endif %}
-                    <input class="form-control" type="password" name="password" placeholder="Password">
+                    <input class="form-control" type="password" name="password1" placeholder="Password">
                 </div>
                 <div class="form-group">
                     <div class="field-label">
@@ -71,7 +73,7 @@
                             </ul>
                         </div>
                     {% endif %}
-                    <input class="form-control" type="password" name="confirmation" placeholder="Confirm Password">
+                    <input class="form-control" type="password" name="password2" placeholder="Confirm the Password">
                 </div>
                 <input class="reg-login-btn" type="submit" value="Register">
             </form>

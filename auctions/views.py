@@ -1,5 +1,6 @@
 from copy import copy
 
+from django.contrib.auth import get_user_model
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -8,10 +9,12 @@ from django.contrib.postgres.search import SearchVector
 from django.views.generic import (ListView, DetailView, View,
     FormView, RedirectView)
 
-from account.models import User
 from .models import Category, Listing, Watchlist
 from .forms import ListingForm, BidForm, CommentForm
 from .mixins import GetListingsQuerySetMixin
+
+
+User = get_user_model()
 
 
 class CategoryView(ListView):

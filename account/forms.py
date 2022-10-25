@@ -1,8 +1,19 @@
-from django.contrib.auth.forms import UserChangeForm, UsernameField
-# from django.forms import ModelForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, UsernameField
+from django.forms import EmailField
 
-from .models import User
+from django.contrib.auth import get_user_model
 
+
+User = get_user_model()
+
+class RegisterFrom(UserCreationForm):
+    """A form to create a new user account."""
+
+    email = EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password1', 'password2')
 
 class BasicUserChangeForm(UserChangeForm):
     """A form to change user's info.
