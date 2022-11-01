@@ -189,7 +189,7 @@ class DetailedListingView(GetFilledForm, DetailView):
             is_author = self.request.user == context['listing_owner']
             is_last_bidder = False
             if bids:
-                is_last_bidder =  bids[0] == self.request.user
+                is_last_bidder = bids[0] == self.request.user
 
             if not is_author and not is_last_bidder and self.object.is_active and not context.get('bid_form'):
                 bid_form = self.bid_form_class()
@@ -256,16 +256,21 @@ class BiddingView(ListView):
     """Render list of bids made by a user."""
 
     paginate_by = 20
-    model = User
+    model = Listing
     template_name = 'auctions/bidding.html'
+    context_object_name = 'bids'
 
-    def get_context_data(self, **kwargs):
-        """Return context by user."""
+    def get_queryset(self):
+        user = get_object_or_404(User,  username=self.request.user)
+        return user.bid_set.order_by('-date_added')
 
-        context = super().get_context_data(**kwargs)
-        context['user'] = get_object_or_404(User, username=self.request.user)
-        context['bids'] = context['user'].bid_set.order_by('-date_added')
-        return context
+    # def get_context_data(self, **kwargs):
+    #     """Return context by user."""
+
+    #     context = super().get_context_data(**kwargs)
+    #     context['user'] = get_object_or_404(User, username=self.request.user)
+    #     context['bids'] = context['user'].bid_set.order_by('-date_added')
+    #     return context
 
 
 class WatchlistView(GetListingsQuerySetMixin, ListView):
