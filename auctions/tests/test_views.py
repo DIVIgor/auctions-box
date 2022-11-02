@@ -1,13 +1,9 @@
-from unittest import skip
+from unittest import skip, skipIf
 from django.test import TestCase, RequestFactory
 from django.urls import reverse, resolve
 from django.contrib.auth import get_user_model
 
-# from account.models import User
 from ..models import Category, Listing, Bid, Comment, Watchlist
-from ..views import (CategoryView, SearchView, IndexView, ListingsByCatView,
-    DetailedListingView, ListingsByOwnerView, BiddingView, AddListingView,
-    AddToWatchlist, WatchlistView, CloseListingView)
 
 User = get_user_model()
 
@@ -353,9 +349,9 @@ class TestBiddingView(
     def test_view_lists_only_active_listings(self):
         pass
 
-    def test_view_lists_only_listings_by_desired_user(self):
-        for listing in self.resp.context[self.context_name]:
-            self.assertEqual(listing.user, self.customer)
+    def test_view_lists_only_bids_by_desired_user(self):
+        for bid in self.resp.context[self.context_name]:
+            self.assertEqual(bid.user, self.customer)
 
 class TestWatchlistView(
         BaseTestViewMethodsMixin, ListingTestViewMethodsMixin, TestCase):
@@ -394,6 +390,42 @@ class TestWatchlistView(
     def test_view_lists_only_active_listings(self):
         pass
 
-    # def test_view_lists_only_listings_by_desired_user(self):
-    #     for listing in self.resp.context[self.context_name]:
-    #         self.assertEqual(listing.user, self.customer)
+class TestAddToWatchlist(BaseTestViewMethodsMixin, TestCase):
+    """A test case for Add to Watchlist view."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.owner = User.objects.create_user(username='owner')
+        cls.customer = User.objects.create_user(username='customer')
+        cls.category = Category.objects.create(name='Cat', slug='cat')
+
+        cls.listing = Listing.objects.create(
+            category = cls.category,
+            user = cls.owner,
+            name = 'Listing 1',
+            slug = 'listing-1',
+            description = 'A description for test 1.',
+            start_bid = 1)
+
+    def setUp(self):
+        self.status_code = 302
+        self.location = f'/{self.category.slug}/{self.listing.slug}/add_to_watchlist'
+        self.client.force_login(self.customer)
+        self.resp = self.client.get(reverse('auctions:watch',
+            args=[self.category.slug, self.listing.slug]))
+
+    @skip
+    def test_context_object_name(self):
+        pass
+
+    @skip
+    def test_view_uses_correct_template(self):
+        pass
+
+    def test_watchlist_creates_object_if_not_watched(self):
+        self.assertEqual(len(Watchlist.objects.filter(listing=self.listing)), 1)
+
+    def test_watchlist_deletes_object_if_watched(self):
+        self.client.get(reverse('auctions:watch',
+            args=[self.category.slug, self.listing.slug]))
+        self.assertEqual(len(Watchlist.objects.filter(listing=self.listing)), 0)
