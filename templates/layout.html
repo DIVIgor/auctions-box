@@ -1,4 +1,5 @@
 {% load static %}
+{% load mathfilters %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -83,11 +84,13 @@
                             <li class="page-num">
                                 <a href="?page=1" class="basic-link">1</a>
                             </li>
-                            <li class="three-dots">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgba(27, 73, 101, 0.6)" class="bi bi-three-dots" viewBox="0 0 16 3">
-                                    <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
-                                </svg>
-                            </li>
+                            {% if page_obj.number != 4 %}
+                                <li class="three-dots">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgba(27, 73, 101, 0.6)" class="bi bi-three-dots" viewBox="0 0 16 3">
+                                        <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                                    </svg>
+                                </li>
+                            {% endif %}
                         {% endif %}
                         {% for page in page_obj.paginator.page_range %}
                             {% if page_obj.number == page %}
@@ -103,11 +106,13 @@
                             {% endif %}
                         {% endfor %}
                         {% if page_obj.number|add:2 < page_obj.paginator.num_pages %}
-                            <li class="three-dots">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgba(27, 73, 101, 0.6)" class="bi bi-three-dots" viewBox="0 0 16 3">
-                                    <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
-                                </svg>
-                            </li>
+                            {% if page_obj.paginator.num_pages|sub:page_obj.number > 3 %}
+                                <li class="three-dots">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgba(27, 73, 101, 0.6)" class="bi bi-three-dots" viewBox="0 0 16 3">
+                                        <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                                    </svg>
+                                </li>
+                            {% endif %}
                             <li class="page-num">
                                 <a href="?page={{ page_obj.paginator.num_pages }}" class="basic-link">{{ page_obj.paginator.num_pages }}</a>
                             </li>

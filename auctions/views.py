@@ -264,14 +264,6 @@ class BiddingView(ListView):
         user = get_object_or_404(User,  username=self.request.user)
         return user.bid_set.order_by('-date_added')
 
-    # def get_context_data(self, **kwargs):
-    #     """Return context by user."""
-
-    #     context = super().get_context_data(**kwargs)
-    #     context['user'] = get_object_or_404(User, username=self.request.user)
-    #     context['bids'] = context['user'].bid_set.order_by('-date_added')
-    #     return context
-
 
 class WatchlistView(GetListingsQuerySetMixin, ListView):
     """Render user's watchlist watchlist."""
