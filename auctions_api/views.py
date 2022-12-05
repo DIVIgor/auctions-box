@@ -56,7 +56,7 @@ class ListingViewSet(mixins.CreateModelMixin,
         - Updation and deletions for owners and staff only
     """
 
-    queryset = Listing.objects.all()
+    queryset = Listing.objects.order_by('-date_added')
     serializer_class = ListingSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = ListingSetPagination

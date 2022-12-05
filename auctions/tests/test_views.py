@@ -29,6 +29,8 @@ class BaseTestViewMethodsMixin:
 class ListingTestViewMethodsMixin:
     """A mixin of test methods for views that return listings.
     Contains functions:
+        - `test_view_lists_only_active_listings`
+        - `test_pagination_is_correct`
     """
 
     def test_view_lists_only_active_listings(self):
