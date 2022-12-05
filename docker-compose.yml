@@ -11,13 +11,16 @@ services:
       - POSTGRES_USER=${PSQL_U}
       - POSTGRES_PASSWORD=${PSQL_PASS}
     ports:
-      - 5432:5432
+      - ${PSQL_PORT}:5432
     restart: always
 
   web:
     container_name: cs-50_commerce
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput --clear &&
+             python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
     ports:

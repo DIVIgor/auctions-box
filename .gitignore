@@ -12,3 +12,4 @@ staticfiles/
 *.bak
 media
 docker-compose.ci.yml
+*.dump
