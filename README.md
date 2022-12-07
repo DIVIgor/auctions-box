@@ -12,13 +12,15 @@ An auction app based on Django, Django REST Framework and PostgreSQL.
 The idea to create this app was born when I completed CS50's task. I wanted to build a more complex auction app. And use in one project most technologies I know.
 
 ## Web page
-https://auctions-box.herokuapp.com/
+https://auctions-box.up.railway.app/
 
 You can log in as a demo user to test functionality:
 - login: user
 - password: demo#321
 
 Or create your own one.
+
+PS: Unfortunately, free Postgres support is no longer available on Heroku. So the app is now deployed on the Railway.app service. But I faced there an issue with collecting static. So the AuctionsBox will work in debug mode till I find a solution.
 
 ## Technologies
 - Python 3.10
@@ -28,7 +30,7 @@ Or create your own one.
 - HTML 5
 - CSS 3
 - Docker
-- Heroku
+- Heroku/Railway
 - Swagger
 
 ## Features
@@ -102,9 +104,17 @@ API features:
   ![add_listing_demo](https://user-images.githubusercontent.com/44866199/200441023-92758cda-c70e-458a-9430-ac18ba15f938.gif)
 
 - Admin-panel demo
-  ![Admin-panel demo](https://user-images.githubusercontent.com/44866199/190412901-a6578c1d-ed08-4381-8b77-cb36f1510d38.gif)
+![Admin-panel demo](https://user-images.githubusercontent.com/44866199/190412901-a6578c1d-ed08-4381-8b77-cb36f1510d38.gif)
 
 - API:
     - Docs
     ![API_docs_demo_lq](https://user-images.githubusercontent.com/44866199/200445769-b8dd64d5-156b-4f99-ab8a-b72e8e509f18.gif)
 
+    - Unauthenticated usage
+    ![unauthorized_user_demo](https://user-images.githubusercontent.com/44866199/206253961-4c996b03-5831-4506-9134-dbfe334e26cd.gif)
+
+    - Token authentication
+    ![token_authorization_demo](https://user-images.githubusercontent.com/44866199/206254171-9c08a46e-1b51-436b-b2d2-ec0388ba0ca9.gif)
+
+    - Authenticated usage
+    ![authorized_user_demo](https://user-images.githubusercontent.com/44866199/206254240-8f9d1d09-eb34-4695-95e2-d2509f0f454b.gif)
