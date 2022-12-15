@@ -124,6 +124,11 @@
             <div>
                 <a class="basic-link" id="footer_urls" href="{% url 'schema-swagger-ui' %}">API</a>
             </div>
+            {% if user.is_authenticated %}
+            <div>
+                <a class="basic-link" id="footer_urls" href="{% url 'graphs:cat_graph' %}">Analytics</a>
+            </div>
+            {% endif %}
             <div>
                 Copyright © 2021-2022 AUCTIONS Inc. All Rights Reserved. Joking :)
             </div>

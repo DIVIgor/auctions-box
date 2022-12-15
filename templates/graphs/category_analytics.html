@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+
+{% block title %}Analytics{% endblock title %}
+
+{% block body %}
+    <div class="basic-title">
+        <h1 class="page-title">Analytics</h1>
+    </div>
+    
+        {% if cat_graph %}
+            {{ pie|safe }}
+            {{ bar|safe }}
+        {% else %}
+            <p>Sorry, this page is empty.</p>
+        {% endif %}
+    
+{% endblock body %}
