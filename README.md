@@ -32,6 +32,7 @@ PS: Unfortunately, free Postgres support is no longer available on Heroku. So th
 - Docker
 - Heroku/Railway
 - Swagger
+- Plotly
 
 ## Features
 Using this app, you can:
@@ -41,6 +42,7 @@ Using this app, you can:
 - Get complete information about a listing
 - Search for listings by name, description, or author
 - Get API docs
+- Get analytics graphs
 
 If authenticated, you also can:
 - Bid listings
@@ -102,6 +104,9 @@ API features:
 
   - Add listing
   ![add_listing_demo](https://user-images.githubusercontent.com/44866199/200441023-92758cda-c70e-458a-9430-ac18ba15f938.gif)
+  
+  - Analytics (with Plotly)
+  ![number_of_listings_graph](https://user-images.githubusercontent.com/44866199/208753473-a0347fb9-ed0c-453e-9818-5daac81aa73c.gif)
 
 - Admin-panel demo
 ![Admin-panel demo](https://user-images.githubusercontent.com/44866199/190412901-a6578c1d-ed08-4381-8b77-cb36f1510d38.gif)
